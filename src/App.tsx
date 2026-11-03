@@ -41,24 +41,25 @@ const MainApp: React.FC = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [currentView]);
 
-  // Route Isolation Check: If in admin backend, render ONLY isolated Admin Layout Shell!
-  if (currentView === 'admin') {
-    return (
-      <>
-        <AdminLayout>
-          <AdminDashboardView />
-        </AdminLayout>
-        <CommandKModal />
-        <ToastContainer />
-      </>
-    );
-  }
+  // Check URL pathname or view for Admin portal request and redirect to dedicated Backend domain
+  useEffect(() => {
+    const path = (window.location.pathname + window.location.search).toLowerCase();
+    if (path.includes('admin') || currentView === 'admin' || currentView === 'admin-login') {
+      window.location.href = 'https://jutakaprabackend.vercel.app/';
+    }
+  }, [currentView]);
 
-  if (currentView === 'admin-login') {
+  if (currentView === 'admin' || currentView === 'admin-login') {
     return (
-      <div className={`min-h-screen ${themeMode === 'dark' ? 'bg-[#0b0e14] text-white' : 'bg-neutral-100 text-[#0a0a0a]'} flex items-center justify-center font-sans`}>
-        <AdminLoginView />
-        <ToastContainer />
+      <div className="min-h-screen bg-[#0a0a0a] text-white flex flex-col items-center justify-center p-6 text-center font-sans">
+        <div className="w-10 h-10 border-2 border-[#e5341f] border-t-transparent rounded-full animate-spin mb-4" />
+        <h2 className="text-xl font-bold tracking-tight">Redirecting to Admin Management Backend...</h2>
+        <p className="text-neutral-400 text-sm mt-2 max-w-md">
+          The administrative management panel is hosted at{' '}
+          <a href="https://jutakaprabackend.vercel.app/" className="text-[#e5341f] underline font-medium">
+            jutakaprabackend.vercel.app
+          </a>
+        </p>
       </div>
     );
   }

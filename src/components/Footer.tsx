@@ -227,14 +227,16 @@ export const Footer: React.FC = () => {
             <span>•</span>
             <span>Non-Fungible Physical Goods</span>
             <span>•</span>
-            <button
-              onClick={() => navigateTo('admin')}
+            <a
+              href="https://jutakaprabackend.vercel.app/"
+              target="_blank"
+              rel="noopener noreferrer"
               className="hover:text-white flex items-center space-x-1.5 transition-colors cursor-pointer text-white/50"
-              title="Internal Admin Portal"
+              title="Management Backend Portal"
             >
               <Lock className="w-3 h-3" />
-              <span>Staff Portal</span>
-            </button>
+              <span>Backend Staff Portal</span>
+            </a>
           </div>
         </div>
       </div>
