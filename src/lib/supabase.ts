@@ -5,7 +5,7 @@ const supabaseUrl =
   import.meta.env.VITE_SUPABASE_URL ||
   (import.meta.env as any).SUPABASE_URL ||
   (import.meta.env as any).NEXT_PUBLIC_SUPABASE_URL ||
-  'https://vtlcbycbsrhcxemwlpbf.supabase.co';
+  'https://kbdrlhiishmetsddlstq.supabase.co';
 
 const supabaseAnonKey =
   import.meta.env.VITE_SUPABASE_ANON_KEY ||
@@ -13,7 +13,7 @@ const supabaseAnonKey =
   (import.meta.env as any).SUPABASE_PUBLISHABLE_KEY ||
   (import.meta.env as any).SUPABASE_ANON_KEY ||
   (import.meta.env as any).NEXT_PUBLIC_SUPABASE_ANON_KEY ||
-  'sb_publishable_qk1ZBdWX9tBmS5V-H3KaFA_T-7CROvL';
+  'sb_publishable_r4PIdoHdJ5606fytYnajYA_DV0ekz1d';
 
 export const isSupabaseConfigured = (): boolean => {
   return Boolean(

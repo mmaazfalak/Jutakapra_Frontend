@@ -4,13 +4,13 @@ import { createClient as createSupabaseClient } from '@supabase/supabase-js';
 const supabaseUrl =
   (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_SUPABASE_URL) ||
   (typeof process !== 'undefined' && process.env?.SUPABASE_URL) ||
-  'https://vtlcbycbsrhcxemwlpbf.supabase.co';
+  'https://kbdrlhiishmetsddlstq.supabase.co';
 
 const supabaseKey =
   (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY) ||
   (typeof process !== 'undefined' && process.env?.SUPABASE_PUBLISHABLE_KEY) ||
   (typeof process !== 'undefined' && process.env?.SUPABASE_SECRET_KEY) ||
-  'sb_publishable_qk1ZBdWX9tBmS5V-H3KaFA_T-7CROvL';
+  'sb_publishable_r4PIdoHdJ5606fytYnajYA_DV0ekz1d';
 
 export const createClient = (cookieStore?: any) => {
   if (cookieStore && typeof createServerClient === 'function') {
