@@ -1,0 +1,19 @@
+# Dependencies
+node_modules/
+
+# Production build outputs
+dist/
+dist-ssr/
+build/
+
+# Local Environment Variables
+.env
+.env.*
+!.env.example
+*.local
+
+# System & IDE files
+.DS_Store
+*.log
+.vscode/
+.antigravity/
