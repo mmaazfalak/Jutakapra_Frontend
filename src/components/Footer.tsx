@@ -228,14 +228,14 @@ export const Footer: React.FC = () => {
             <span>Non-Fungible Physical Goods</span>
             <span>•</span>
             <a
-              href="https://jutakaprabackend.vercel.app/"
+              href={(import.meta as any).env?.VITE_ADMIN_URL || 'https://jutakaprabackend.vercel.app'}
               target="_blank"
               rel="noopener noreferrer"
               className="hover:text-white flex items-center space-x-1.5 transition-colors cursor-pointer text-white/50"
               title="Management Backend Portal"
             >
               <Lock className="w-3 h-3" />
-              <span>Backend Staff Portal</span>
+              <span>Staff Portal (Backend)</span>
             </a>
           </div>
         </div>
