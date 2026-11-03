@@ -3,7 +3,10 @@
  * JSON parse crashes when the server returns HTML (e.g., Vercel 404/500 pages).
  */
 
-const RAW_API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || '').trim();
+const RAW_API_BASE_URL = (
+  import.meta.env.VITE_API_BASE_URL ||
+  (import.meta.env.PROD ? 'https://jutakaprabackend.vercel.app' : '')
+).trim();
 export const API_BASE_URL = RAW_API_BASE_URL.replace(/\/+$/, '');
 
 /**
