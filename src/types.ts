@@ -305,6 +305,11 @@ export interface StoreAccount {
   createdAt: string;
   logoUrl?: string;
   description?: string;
+  defaultCourier?: string;
+  payoutAccountTitle?: string;
+  payoutBankName?: string;
+  payoutIbanOrPhone?: string;
+  badge?: string;
 }
 
 export interface SupabaseStore {
