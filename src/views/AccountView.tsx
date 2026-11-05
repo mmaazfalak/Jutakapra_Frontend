@@ -24,7 +24,6 @@ import {
   ChevronRight,
   Copy,
   Search,
-  Printer,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useStore } from '../context/StoreContext';
@@ -41,7 +40,6 @@ export const AccountView: React.FC = () => {
     profile,
     isAuthLoading,
     orders,
-    refreshOrders,
     themeMode,
     navigateTo,
     openAuthModal,
@@ -75,8 +73,8 @@ export const AccountView: React.FC = () => {
         stepIndex: 0,
         badgeText: 'Stage 1: Processing',
         shortText: 'Processing',
-        badgeClass: 'bg-amber-500/10 text-amber-500 border-amber-500/20',
-        dotColor: 'bg-amber-400',
+        badgeClass: 'bg-amber-500/15 text-amber-700 dark:text-amber-400 border-amber-500/30 font-bold',
+        dotColor: 'bg-amber-500',
         description: 'Order received & queued for authentication and warehouse packaging.',
       };
     }
@@ -85,8 +83,8 @@ export const AccountView: React.FC = () => {
         stepIndex: 1,
         badgeText: 'Stage 1.5: Confirmed',
         shortText: 'Confirmed',
-        badgeClass: 'bg-cyan-500/10 text-cyan-500 border-cyan-500/20',
-        dotColor: 'bg-cyan-400',
+        badgeClass: 'bg-cyan-500/15 text-cyan-800 dark:text-cyan-300 border-cyan-500/30 font-bold',
+        dotColor: 'bg-cyan-500',
         description: 'Verified & confirmed by warehouse. Packing parcel for courier dispatch.',
       };
     }
@@ -95,8 +93,8 @@ export const AccountView: React.FC = () => {
         stepIndex: 2,
         badgeText: 'Stage 2: In Transit',
         shortText: 'In Transit',
-        badgeClass: 'bg-blue-500/10 text-blue-500 border-blue-500/20',
-        dotColor: 'bg-blue-400',
+        badgeClass: 'bg-blue-500/15 text-blue-800 dark:text-blue-300 border-blue-500/30 font-bold',
+        dotColor: 'bg-blue-500',
         description: 'Handed over to courier partner. On the road to your shipping address.',
       };
     }
@@ -105,8 +103,8 @@ export const AccountView: React.FC = () => {
         stepIndex: 3,
         badgeText: 'Stage 3: Delivered',
         shortText: 'Delivered',
-        badgeClass: 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20',
-        dotColor: 'bg-emerald-400',
+        badgeClass: 'bg-emerald-500/15 text-emerald-800 dark:text-emerald-300 border-emerald-500/30 font-bold',
+        dotColor: 'bg-emerald-500',
         description: 'Package successfully delivered and confirmed.',
       };
     }
@@ -115,8 +113,8 @@ export const AccountView: React.FC = () => {
         stepIndex: -1,
         badgeText: 'Cancelled',
         shortText: 'Cancelled',
-        badgeClass: 'bg-red-500/10 text-red-500 border-red-500/20',
-        dotColor: 'bg-red-400',
+        badgeClass: 'bg-red-500/15 text-red-700 dark:text-red-400 border-red-500/30 font-bold',
+        dotColor: 'bg-red-500',
         description: 'This order was cancelled.',
       };
     }
@@ -124,8 +122,8 @@ export const AccountView: React.FC = () => {
       stepIndex: 0,
       badgeText: s,
       shortText: s,
-      badgeClass: 'bg-neutral-500/10 text-neutral-400 border-neutral-500/20',
-      dotColor: 'bg-neutral-400',
+      badgeClass: 'bg-neutral-200 text-neutral-800 dark:bg-neutral-800 dark:text-neutral-200 border-neutral-300 dark:border-neutral-700 font-bold',
+      dotColor: 'bg-neutral-500',
       description: 'Order registered in system.',
     };
   };
@@ -149,7 +147,7 @@ export const AccountView: React.FC = () => {
   const [isChangingPw, setIsChangingPw] = useState(false);
 
   // Effective customer object
-  const activeFullName = profile?.full_name || currentCustomer?.fullName || 'Customer';
+  const activeFullName = profile?.full_name || currentCustomer?.fullName || 'Collector';
   const activeEmail = profile?.email || currentCustomer?.email || '';
   const activePhone = profile?.phone || currentCustomer?.phone || '';
   const activeAvatar = profile?.avatar_url || currentCustomer?.avatarUrl || '';
@@ -348,8 +346,8 @@ export const AccountView: React.FC = () => {
   // Auth Loading Screen
   if (isAuthLoading) {
     return (
-      <div className="min-h-[50vh] flex items-center justify-center font-sans">
-        <div className="w-6 h-6 border-2 border-neutral-400 border-t-transparent rounded-full animate-spin" />
+      <div className="min-h-screen bg-[#eceff1] dark:bg-[#0f1115] flex items-center justify-center font-sans">
+        <div className="w-7 h-7 border-3 border-neutral-800 dark:border-neutral-200 border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -357,25 +355,25 @@ export const AccountView: React.FC = () => {
   // Not Logged In Screen
   if (!currentCustomer && !profile) {
     return (
-      <div className="min-h-[70vh] flex items-center justify-center px-4 py-12 font-sans">
-        <div className="max-w-xs w-full text-center space-y-4">
-          <div className="w-10 h-10 rounded-full bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center mx-auto text-neutral-500 dark:text-neutral-400">
-            <User className="w-4 h-4" />
+      <div className="min-h-screen bg-[#eceff1] dark:bg-[#0f1115] flex items-center justify-center px-4 py-12 font-sans">
+        <div className="max-w-sm w-full bg-white dark:bg-[#161920] border border-neutral-300/90 dark:border-neutral-800 rounded-2xl p-6 text-center space-y-4 shadow-sm">
+          <div className="w-11 h-11 rounded-full bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center mx-auto text-neutral-900 dark:text-neutral-100 shadow-2xs">
+            <User className="w-5 h-5" />
           </div>
           <div className="space-y-1">
-            <h1 className="text-sm font-semibold tracking-tight text-neutral-900 dark:text-neutral-100">
+            <h1 className="text-base font-extrabold tracking-tight text-neutral-950 dark:text-white">
               Customer Account
             </h1>
-            <p className="text-[11px] text-neutral-500 dark:text-neutral-400 leading-relaxed">
+            <p className="text-xs text-neutral-700 dark:text-neutral-300 leading-relaxed font-medium">
               Sign in to manage your orders, saved addresses, and live shipments.
             </p>
           </div>
-          <div className="space-y-2 pt-1">
+          <div className="space-y-2.5 pt-1">
             <button
               onClick={() => openAuthModal('google')}
-              className="w-full h-8 px-3 rounded-lg border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 text-neutral-800 dark:text-neutral-200 hover:bg-neutral-50 dark:hover:bg-neutral-800 font-medium text-xs transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-2xs"
+              className="w-full h-9 px-3 rounded-xl border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-neutral-950 dark:text-white hover:bg-neutral-50 dark:hover:bg-neutral-800 font-bold text-xs transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-2xs"
             >
-              <svg className="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24">
+              <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24">
                 <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
                 <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
                 <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" />
@@ -386,13 +384,13 @@ export const AccountView: React.FC = () => {
             <div className="grid grid-cols-2 gap-2">
               <button
                 onClick={() => navigateTo('login')}
-                className="h-8 px-2 rounded-lg border border-neutral-200 dark:border-neutral-800 text-neutral-800 dark:text-neutral-200 hover:bg-neutral-50 dark:hover:bg-neutral-800 font-medium text-xs cursor-pointer transition-colors"
+                className="h-9 px-2 rounded-xl border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-neutral-950 dark:text-neutral-100 hover:bg-neutral-50 dark:hover:bg-neutral-800 font-bold text-xs cursor-pointer transition-colors"
               >
                 Log In
               </button>
               <button
                 onClick={() => navigateTo('register')}
-                className="h-8 px-2 rounded-lg bg-[#e5341f] hover:bg-[#c42912] text-white font-medium text-xs transition-colors cursor-pointer shadow-2xs"
+                className="h-9 px-2 rounded-xl bg-[#e5341f] hover:bg-[#c42912] text-white font-bold text-xs transition-colors cursor-pointer shadow-2xs"
               >
                 Register
               </button>
@@ -404,7 +402,7 @@ export const AccountView: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen font-sans pb-16 pt-4 sm:pt-6">
+    <div className="min-h-screen bg-[#eceff1] dark:bg-[#0f1115] font-sans pb-16 pt-4 sm:pt-6 transition-colors duration-200">
       {/* Hidden file input for photo upload */}
       <input
         ref={fileInputRef}
@@ -414,7 +412,7 @@ export const AccountView: React.FC = () => {
         className="hidden"
       />
 
-      <div className="max-w-xl mx-auto px-4 sm:px-6">
+      <div className="max-w-xl mx-auto px-4 sm:px-6 space-y-3.5">
         <AnimatePresence mode="wait">
           {/* ============ OVERVIEW / MAIN PROFILE VIEW ============ */}
           {activeTab === 'overview' && (
@@ -424,252 +422,284 @@ export const AccountView: React.FC = () => {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -6 }}
               transition={{ duration: 0.15 }}
-              className="space-y-4"
+              className="space-y-3.5"
             >
-              {/* Profile Header (Compact & Borderless) */}
-              <div className="flex items-center justify-between gap-3 pt-2">
-                <div className="flex items-center space-x-3.5 min-w-0">
-                  {/* Compact Avatar (44px) */}
-                  <div className="relative group shrink-0">
-                    <div className="w-11 h-11 rounded-full overflow-hidden bg-neutral-200 dark:bg-neutral-800 flex items-center justify-center">
-                      {activeAvatar ? (
-                        <img
-                          src={activeAvatar}
-                          alt={activeFullName}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <span className="text-xs font-bold text-neutral-700 dark:text-neutral-300">
-                          {activeFullName.charAt(0).toUpperCase()}
-                        </span>
-                      )}
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => fileInputRef.current?.click()}
-                      className="absolute inset-0 rounded-full bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white cursor-pointer transition-opacity"
-                      title="Change photo"
-                    >
-                      <Camera className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-
-                  {/* Name & Email */}
-                  <div className="min-w-0">
-                    <h2 className="text-sm sm:text-base font-semibold tracking-tight text-neutral-900 dark:text-white truncate">
-                      {activeFullName}
-                    </h2>
-                    <p className="text-[11px] text-neutral-500 dark:text-neutral-400 font-mono truncate">
-                      {activeEmail}
-                    </p>
-                    {activePhone ? (
-                      <p className="text-[11px] text-neutral-500 dark:text-neutral-400 flex items-center gap-1 font-mono">
-                        <Phone className="w-2.5 h-2.5" />
-                        <span>{activePhone}</span>
-                      </p>
-                    ) : null}
-                  </div>
-                </div>
-
-                {/* Edit Profile Toggle Button */}
-                {!isEditingProfile && (
-                  <button
-                    onClick={startEditing}
-                    className="text-[11px] font-medium text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white underline-offset-2 hover:underline cursor-pointer shrink-0 transition-colors"
-                  >
-                    Edit
-                  </button>
-                )}
-              </div>
-
-              {/* Inline Profile Editing Mode */}
-              {isEditingProfile && (
-                <div className="pt-2 pb-3 border-y border-neutral-100 dark:border-neutral-800/80 space-y-3">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                    <div>
-                      <label className="block text-[10px] font-medium uppercase tracking-wider text-neutral-400 mb-1">
-                        Full Name
-                      </label>
-                      <input
-                        type="text"
-                        value={editName}
-                        onChange={(e) => setEditName(e.target.value)}
-                        placeholder="Full name"
-                        className="w-full h-8 px-2.5 text-xs rounded-lg border border-neutral-200 dark:border-neutral-800 bg-transparent text-neutral-900 dark:text-white focus:outline-none focus:border-neutral-400 dark:focus:border-neutral-600 transition-colors"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-[10px] font-medium uppercase tracking-wider text-neutral-400 mb-1">
-                        Phone Number
-                      </label>
-                      <input
-                        type="tel"
-                        value={editPhone}
-                        onChange={(e) => setEditPhone(e.target.value)}
-                        placeholder="0300 1234567"
-                        className="w-full h-8 px-2.5 text-xs rounded-lg border border-neutral-200 dark:border-neutral-800 bg-transparent text-neutral-900 dark:text-white focus:outline-none focus:border-neutral-400 dark:focus:border-neutral-600 transition-colors font-mono"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="flex items-center justify-between pt-1">
-                    <div className="flex items-center gap-2">
+              {/* Profile Header Card */}
+              <div className="bg-white dark:bg-[#161920] border border-neutral-300/80 dark:border-neutral-800 rounded-2xl p-4 sm:p-5 shadow-xs">
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex items-center space-x-3.5 min-w-0">
+                    {/* Compact Avatar (48px) with Crisp Dark Ring */}
+                    <div className="relative group shrink-0">
+                      <div className="w-12 h-12 rounded-full overflow-hidden bg-neutral-900 text-white flex items-center justify-center ring-2 ring-neutral-300 dark:ring-neutral-700 shadow-2xs">
+                        {activeAvatar ? (
+                          <img
+                            src={activeAvatar}
+                            alt={activeFullName}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <span className="text-sm font-black text-white">
+                            {activeFullName.charAt(0).toUpperCase()}
+                          </span>
+                        )}
+                      </div>
                       <button
                         type="button"
                         onClick={() => fileInputRef.current?.click()}
-                        className="text-[11px] text-neutral-600 dark:text-neutral-300 hover:underline cursor-pointer"
+                        className="absolute inset-0 rounded-full bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white cursor-pointer transition-opacity"
+                        title="Change photo"
                       >
-                        Change photo
+                        <Camera className="w-4 h-4" />
                       </button>
-                      {activeAvatar && (
-                        <button
-                          type="button"
-                          onClick={removeProfilePhoto}
-                          className="text-[11px] text-red-500 hover:underline cursor-pointer"
-                        >
-                          Remove photo
-                        </button>
-                      )}
                     </div>
-                    <div className="flex items-center gap-2">
-                      <button
-                        type="button"
-                        onClick={cancelEditing}
-                        disabled={isSaving}
-                        className="h-7 px-2.5 rounded-lg text-xs font-medium text-neutral-500 hover:text-neutral-800 dark:hover:text-white cursor-pointer transition-colors"
-                      >
-                        Cancel
-                      </button>
-                      <button
-                        type="button"
-                        onClick={saveProfile}
-                        disabled={isSaving}
-                        className="h-7 px-3 rounded-lg bg-neutral-900 hover:bg-neutral-800 dark:bg-white dark:hover:bg-neutral-200 text-white dark:text-black text-xs font-medium cursor-pointer transition-colors disabled:opacity-50"
-                      >
-                        {isSaving ? 'Saving...' : 'Save'}
-                      </button>
+
+                    {/* Dark High-Contrast Name, Email & Phone */}
+                    <div className="min-w-0 space-y-0.5">
+                      <h2 className="text-sm sm:text-base font-extrabold tracking-tight text-neutral-950 dark:text-white truncate">
+                        {activeFullName}
+                      </h2>
+                      <p className="text-xs text-neutral-800 dark:text-neutral-200 font-mono font-semibold truncate">
+                        {activeEmail}
+                      </p>
+                      {activePhone ? (
+                        <p className="text-xs text-neutral-700 dark:text-neutral-300 flex items-center gap-1.5 font-mono font-semibold">
+                          <Phone className="w-3 h-3 text-neutral-600 dark:text-neutral-400" />
+                          <span>{activePhone}</span>
+                        </p>
+                      ) : null}
                     </div>
                   </div>
-                </div>
-              )}
 
-              {/* Minimal Stat Line (Borderless & Small) */}
-              <div className="grid grid-cols-3 py-2.5 border-y border-neutral-100 dark:border-neutral-800/80 text-center">
-                <div>
-                  <span className="text-[10px] uppercase tracking-wider text-neutral-400 block font-medium">Spent</span>
-                  <span className="text-xs font-semibold font-mono text-neutral-900 dark:text-neutral-100">
-                    {formatPKR(totalSpent || currentCustomer?.lifetimeValue || 0)}
-                  </span>
+                  {/* Edit Profile Toggle Button */}
+                  {!isEditingProfile && (
+                    <button
+                      onClick={startEditing}
+                      className="px-3 py-1.5 rounded-lg border border-neutral-300 dark:border-neutral-700 text-neutral-950 dark:text-white hover:bg-neutral-100 dark:hover:bg-neutral-800 text-xs font-bold transition-colors cursor-pointer shrink-0 shadow-2xs"
+                    >
+                      Edit
+                    </button>
+                  )}
                 </div>
-                <div className="border-x border-neutral-100 dark:border-neutral-800/80">
-                  <span className="text-[10px] uppercase tracking-wider text-neutral-400 block font-medium">Orders</span>
-                  <span className="text-xs font-semibold font-mono text-neutral-900 dark:text-neutral-100">
-                    {customerOrders.length}
-                  </span>
-                </div>
-                <div>
-                  <span className="text-[10px] uppercase tracking-wider text-neutral-400 block font-medium">In Transit</span>
-                  <span className={`text-xs font-semibold font-mono ${activeShipments.length > 0 ? 'text-[#e5341f]' : 'text-neutral-900 dark:text-neutral-100'}`}>
-                    {activeShipments.length}
-                  </span>
+
+                {/* Inline Profile Editing Mode */}
+                {isEditingProfile && (
+                  <div className="pt-4 mt-3 border-t border-neutral-200 dark:border-neutral-800 space-y-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-[11px] font-bold uppercase tracking-wider text-neutral-700 dark:text-neutral-300 mb-1">
+                          Full Name
+                        </label>
+                        <input
+                          type="text"
+                          value={editName}
+                          onChange={(e) => setEditName(e.target.value)}
+                          placeholder="Full name"
+                          className="w-full h-8.5 px-3 text-xs font-semibold rounded-lg border border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-900 text-neutral-950 dark:text-white focus:outline-none focus:border-neutral-800 dark:focus:border-neutral-300 transition-colors"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[11px] font-bold uppercase tracking-wider text-neutral-700 dark:text-neutral-300 mb-1">
+                          Phone Number
+                        </label>
+                        <input
+                          type="tel"
+                          value={editPhone}
+                          onChange={(e) => setEditPhone(e.target.value)}
+                          placeholder="0300 1234567"
+                          className="w-full h-8.5 px-3 text-xs font-semibold rounded-lg border border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-900 text-neutral-950 dark:text-white focus:outline-none focus:border-neutral-800 dark:focus:border-neutral-300 transition-colors font-mono"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between pt-1">
+                      <div className="flex items-center gap-3">
+                        <button
+                          type="button"
+                          onClick={() => fileInputRef.current?.click()}
+                          className="text-xs font-bold text-neutral-800 dark:text-neutral-200 hover:underline cursor-pointer"
+                        >
+                          Change photo
+                        </button>
+                        {activeAvatar && (
+                          <button
+                            type="button"
+                            onClick={removeProfilePhoto}
+                            className="text-xs font-bold text-red-600 dark:text-red-400 hover:underline cursor-pointer"
+                          >
+                            Remove photo
+                          </button>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={cancelEditing}
+                          disabled={isSaving}
+                          className="h-8 px-3 rounded-lg text-xs font-bold text-neutral-700 hover:text-neutral-950 dark:text-neutral-300 dark:hover:text-white cursor-pointer transition-colors"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          type="button"
+                          onClick={saveProfile}
+                          disabled={isSaving}
+                          className="h-8 px-3.5 rounded-lg bg-neutral-950 hover:bg-neutral-800 dark:bg-white dark:hover:bg-neutral-200 text-white dark:text-black text-xs font-bold cursor-pointer transition-colors disabled:opacity-50 shadow-2xs"
+                        >
+                          {isSaving ? 'Saving...' : 'Save Changes'}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Metrics Strip Card on Gray Canvas */}
+              <div className="bg-white dark:bg-[#161920] border border-neutral-300/80 dark:border-neutral-800 rounded-2xl p-3 shadow-xs">
+                <div className="grid grid-cols-3 text-center divide-x divide-neutral-200 dark:divide-neutral-800">
+                  <div className="px-2">
+                    <span className="text-[10px] uppercase tracking-wider text-neutral-600 dark:text-neutral-400 block font-bold">Total Spent</span>
+                    <span className="text-xs sm:text-sm font-black font-mono text-neutral-950 dark:text-white mt-0.5 block">
+                      {formatPKR(totalSpent || currentCustomer?.lifetimeValue || 0)}
+                    </span>
+                  </div>
+                  <div className="px-2">
+                    <span className="text-[10px] uppercase tracking-wider text-neutral-600 dark:text-neutral-400 block font-bold">Total Orders</span>
+                    <span className="text-xs sm:text-sm font-black font-mono text-neutral-950 dark:text-white mt-0.5 block">
+                      {customerOrders.length}
+                    </span>
+                  </div>
+                  <div className="px-2">
+                    <span className="text-[10px] uppercase tracking-wider text-neutral-600 dark:text-neutral-400 block font-bold">In Transit</span>
+                    <span className={`text-xs sm:text-sm font-black font-mono mt-0.5 block ${activeShipments.length > 0 ? 'text-[#e5341f]' : 'text-neutral-950 dark:text-white'}`}>
+                      {activeShipments.length}
+                    </span>
+                  </div>
                 </div>
               </div>
 
-              {/* Latest Order Spotlight Preview (if user has orders) */}
+              {/* Latest Order Spotlight (if exists) */}
               {latestOrder && (
                 <div
                   onClick={() => setActiveTab('orders')}
-                  className="p-3 rounded-xl bg-neutral-50 dark:bg-neutral-900/60 flex items-center justify-between cursor-pointer hover:bg-neutral-100 dark:hover:bg-neutral-900 transition-colors"
+                  className="bg-white dark:bg-[#161920] border border-neutral-300/80 dark:border-neutral-800 rounded-2xl p-3.5 flex items-center justify-between cursor-pointer hover:border-neutral-400 dark:hover:border-neutral-700 transition-all shadow-xs"
                 >
                   <div className="flex items-center space-x-3 min-w-0">
-                    <div className="w-8 h-8 rounded-lg bg-neutral-200 dark:bg-neutral-800 flex items-center justify-center shrink-0">
-                      <Package className="w-4 h-4 text-neutral-600 dark:text-neutral-300" />
+                    <div className="w-9 h-9 rounded-xl bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center shrink-0 text-neutral-950 dark:text-white">
+                      <Package className="w-4 h-4" />
                     </div>
                     <div className="min-w-0">
-                      <p className="text-xs font-semibold text-neutral-900 dark:text-neutral-100 truncate">
-                        #{latestOrder.orderNumber} • {formatPKR(latestOrder.total)}
-                      </p>
-                      <p className="text-[10px] text-neutral-500 dark:text-neutral-400 truncate">
-                        {latestOrder.items.length} {latestOrder.items.length === 1 ? 'item' : 'items'} • {latestOrder.status}
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-black text-neutral-950 dark:text-white font-mono">
+                          #{latestOrder.orderNumber}
+                        </span>
+                        <span className="text-[11px] font-bold text-neutral-700 dark:text-neutral-300 font-mono">
+                          {formatPKR(latestOrder.total)}
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-neutral-600 dark:text-neutral-400 font-semibold truncate mt-0.5">
+                        {latestOrder.items.length} {latestOrder.items.length === 1 ? 'item' : 'items'} • Status: <strong className="text-neutral-950 dark:text-white">{latestOrder.status}</strong>
                       </p>
                     </div>
                   </div>
-                  <ChevronRight className="w-3.5 h-3.5 text-neutral-400 shrink-0" />
+                  <div className="flex items-center gap-1 text-xs font-bold text-neutral-800 dark:text-neutral-200 shrink-0">
+                    <span className="hidden sm:inline">Track</span>
+                    <ChevronRight className="w-4 h-4" />
+                  </div>
                 </div>
               )}
 
-              {/* Borderless Flat List Menu */}
-              <div className="divide-y divide-neutral-100 dark:divide-neutral-800/80 pt-1">
+              {/* Grouped Menu Card */}
+              <div className="bg-white dark:bg-[#161920] border border-neutral-300/80 dark:border-neutral-800 rounded-2xl shadow-xs divide-y divide-neutral-200 dark:divide-neutral-800/80 overflow-hidden">
                 {/* Orders & Tracking */}
                 <button
                   onClick={() => setActiveTab('orders')}
-                  className="w-full py-3 flex items-center justify-between text-left group transition-colors cursor-pointer"
+                  className="w-full p-3.5 flex items-center justify-between text-left group hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors cursor-pointer"
                 >
-                  <div className="flex items-center space-x-3">
-                    <Package className="w-4 h-4 text-neutral-400 group-hover:text-neutral-900 dark:group-hover:text-white transition-colors" />
-                    <span className="text-xs font-medium text-neutral-900 dark:text-neutral-100">Orders & Tracking</span>
+                  <div className="flex items-center space-x-3.5">
+                    <div className="w-8.5 h-8.5 rounded-xl bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center text-neutral-900 dark:text-white shrink-0 group-hover:bg-neutral-900 group-hover:text-white dark:group-hover:bg-white dark:group-hover:text-black transition-colors">
+                      <Package className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <p className="text-xs font-bold text-neutral-950 dark:text-white">Orders & Tracking</p>
+                      <p className="text-[11px] text-neutral-600 dark:text-neutral-400 font-medium">Track live parcels and past order history</p>
+                    </div>
                   </div>
                   <div className="flex items-center space-x-2">
                     {customerOrders.length > 0 && (
-                      <span className="text-[11px] text-neutral-400 font-mono">
-                        {customerOrders.length} {customerOrders.length === 1 ? 'order' : 'orders'}
+                      <span className="text-xs text-neutral-700 dark:text-neutral-300 font-mono font-bold">
+                        {customerOrders.length}
                       </span>
                     )}
                     {activeShipments.length > 0 && (
-                      <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-[#e5341f]/10 text-[#e5341f]">
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-[#e5341f] text-white">
                         {activeShipments.length} Active
                       </span>
                     )}
-                    <ChevronRight className="w-3.5 h-3.5 text-neutral-400 group-hover:translate-x-0.5 transition-transform" />
+                    <ChevronRight className="w-4 h-4 text-neutral-500 group-hover:translate-x-0.5 transition-transform" />
                   </div>
                 </button>
 
                 {/* Shipping Addresses */}
                 <button
                   onClick={() => setActiveTab('addresses')}
-                  className="w-full py-3 flex items-center justify-between text-left group transition-colors cursor-pointer"
+                  className="w-full p-3.5 flex items-center justify-between text-left group hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors cursor-pointer"
                 >
-                  <div className="flex items-center space-x-3">
-                    <MapPin className="w-4 h-4 text-neutral-400 group-hover:text-neutral-900 dark:group-hover:text-white transition-colors" />
-                    <span className="text-xs font-medium text-neutral-900 dark:text-neutral-100">Shipping Addresses</span>
+                  <div className="flex items-center space-x-3.5">
+                    <div className="w-8.5 h-8.5 rounded-xl bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center text-neutral-900 dark:text-white shrink-0 group-hover:bg-neutral-900 group-hover:text-white dark:group-hover:bg-white dark:group-hover:text-black transition-colors">
+                      <MapPin className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <p className="text-xs font-bold text-neutral-950 dark:text-white">Shipping Addresses</p>
+                      <p className="text-[11px] text-neutral-600 dark:text-neutral-400 font-medium">Manage saved destinations for 1-click checkout</p>
+                    </div>
                   </div>
                   <div className="flex items-center space-x-2">
                     {activeAddresses.length > 0 && (
-                      <span className="text-[11px] text-neutral-400">
+                      <span className="text-xs text-neutral-700 dark:text-neutral-300 font-bold">
                         {activeAddresses.length} saved
                       </span>
                     )}
-                    <ChevronRight className="w-3.5 h-3.5 text-neutral-400 group-hover:translate-x-0.5 transition-transform" />
+                    <ChevronRight className="w-4 h-4 text-neutral-500 group-hover:translate-x-0.5 transition-transform" />
                   </div>
                 </button>
 
                 {/* Security & Password */}
                 <button
                   onClick={() => setActiveTab('security')}
-                  className="w-full py-3 flex items-center justify-between text-left group transition-colors cursor-pointer"
+                  className="w-full p-3.5 flex items-center justify-between text-left group hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors cursor-pointer"
                 >
-                  <div className="flex items-center space-x-3">
-                    <ShieldCheck className="w-4 h-4 text-neutral-400 group-hover:text-neutral-900 dark:group-hover:text-white transition-colors" />
-                    <span className="text-xs font-medium text-neutral-900 dark:text-neutral-100">Security & Password</span>
+                  <div className="flex items-center space-x-3.5">
+                    <div className="w-8.5 h-8.5 rounded-xl bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center text-neutral-900 dark:text-white shrink-0 group-hover:bg-neutral-900 group-hover:text-white dark:group-hover:bg-white dark:group-hover:text-black transition-colors">
+                      <ShieldCheck className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <p className="text-xs font-bold text-neutral-950 dark:text-white">Security & Login</p>
+                      <p className="text-[11px] text-neutral-600 dark:text-neutral-400 font-medium">Password credentials and Google authorization</p>
+                    </div>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <span className="text-[11px] text-neutral-400">
-                      {(currentCustomer.authProvider === 'google' || profile?.auth_provider === 'google') ? 'Google' : 'Password'}
+                    <span className="text-xs text-neutral-700 dark:text-neutral-300 font-bold">
+                      {(currentCustomer.authProvider === 'google' || profile?.auth_provider === 'google') ? 'Google Linked' : 'Password'}
                     </span>
-                    <ChevronRight className="w-3.5 h-3.5 text-neutral-400 group-hover:translate-x-0.5 transition-transform" />
+                    <ChevronRight className="w-4 h-4 text-neutral-500 group-hover:translate-x-0.5 transition-transform" />
                   </div>
                 </button>
 
                 {/* Sign Out */}
                 <button
                   onClick={logoutCustomer}
-                  className="w-full py-3 flex items-center justify-between text-left group transition-colors cursor-pointer text-red-500 hover:text-red-600 dark:text-red-400"
+                  className="w-full p-3.5 flex items-center justify-between text-left group hover:bg-red-50 dark:hover:bg-red-950/20 transition-colors cursor-pointer text-red-600 dark:text-red-400"
                 >
-                  <div className="flex items-center space-x-3">
-                    <LogOut className="w-4 h-4" />
-                    <span className="text-xs font-medium">Sign Out</span>
+                  <div className="flex items-center space-x-3.5">
+                    <div className="w-8.5 h-8.5 rounded-xl bg-red-100 dark:bg-red-950/40 flex items-center justify-center text-red-600 dark:text-red-400 shrink-0">
+                      <LogOut className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <p className="text-xs font-bold text-red-600 dark:text-red-400">Sign Out</p>
+                      <p className="text-[11px] text-neutral-600 dark:text-neutral-400 font-medium">End your session on this device</p>
+                    </div>
                   </div>
-                  <ChevronRight className="w-3.5 h-3.5 opacity-60 group-hover:translate-x-0.5 transition-transform" />
+                  <ChevronRight className="w-4 h-4 text-red-400 group-hover:translate-x-0.5 transition-transform" />
                 </button>
               </div>
             </motion.div>
@@ -683,42 +713,42 @@ export const AccountView: React.FC = () => {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -6 }}
               transition={{ duration: 0.15 }}
-              className="space-y-4"
+              className="space-y-3.5"
             >
-              {/* Back to Account Sub-Header */}
-              <div className="flex items-center justify-between pb-2 border-b border-neutral-100 dark:border-neutral-800/80">
+              {/* Top Sub-Bar with Back Link */}
+              <div className="bg-white dark:bg-[#161920] border border-neutral-300/80 dark:border-neutral-800 rounded-2xl p-3.5 flex items-center justify-between shadow-xs">
                 <button
                   onClick={() => setActiveTab('overview')}
-                  className="inline-flex items-center gap-1.5 text-xs font-medium text-neutral-600 dark:text-neutral-400 hover:text-black dark:hover:text-white transition-colors cursor-pointer"
+                  className="inline-flex items-center gap-1.5 text-xs font-bold text-neutral-800 dark:text-neutral-200 hover:text-black dark:hover:text-white transition-colors cursor-pointer"
                 >
-                  <ArrowLeft className="w-3.5 h-3.5" />
+                  <ArrowLeft className="w-4 h-4" />
                   <span>Account</span>
                 </button>
-                <h3 className="text-xs font-semibold text-neutral-900 dark:text-white">
+                <h3 className="text-xs font-extrabold text-neutral-950 dark:text-white uppercase tracking-wider">
                   Orders & Tracking
                 </h3>
-                <span className="text-[11px] font-mono text-neutral-400">
+                <span className="text-xs font-black font-mono text-neutral-950 dark:text-white bg-neutral-100 dark:bg-neutral-800 px-2 py-0.5 rounded-md">
                   {customerOrders.length}
                 </span>
               </div>
 
-              {/* Search & Filter Bar */}
-              <div className="space-y-2">
+              {/* Search & Filter Card */}
+              <div className="bg-white dark:bg-[#161920] border border-neutral-300/80 dark:border-neutral-800 rounded-2xl p-3 shadow-xs space-y-2.5">
                 <div className="relative">
-                  <Search className="w-3.5 h-3.5 text-neutral-400 absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  <Search className="w-4 h-4 text-neutral-500 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                   <input
                     type="text"
                     value={orderSearchQuery}
                     onChange={(e) => setOrderSearchQuery(e.target.value)}
-                    placeholder="Search by order # or product..."
-                    className="w-full h-8 pl-8 pr-3 rounded-lg border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900/60 text-xs focus:outline-none focus:border-neutral-400 dark:focus:border-neutral-600 transition-colors"
+                    placeholder="Search by order # or product title..."
+                    className="w-full h-8.5 pl-9 pr-3 rounded-xl border border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-900 text-xs font-semibold text-neutral-950 dark:text-white focus:outline-none focus:border-neutral-800 dark:focus:border-neutral-300 transition-colors"
                   />
                 </div>
 
                 {/* Filter Pills */}
                 <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
                   {([
-                    { id: 'all', label: 'All' },
+                    { id: 'all', label: 'All Orders' },
                     { id: 'processing', label: 'Processing' },
                     { id: 'confirmed', label: 'Confirmed' },
                     { id: 'dispatched', label: 'In Transit' },
@@ -727,10 +757,10 @@ export const AccountView: React.FC = () => {
                     <button
                       key={tab.id}
                       onClick={() => setOrderStatusFilter(tab.id)}
-                      className={`px-2.5 py-1 rounded-full text-[10px] font-medium transition-colors cursor-pointer whitespace-nowrap ${
+                      className={`px-3 py-1 rounded-lg text-xs font-bold transition-colors cursor-pointer whitespace-nowrap ${
                         orderStatusFilter === tab.id
-                          ? 'bg-neutral-900 text-white dark:bg-white dark:text-black'
-                          : 'bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-700'
+                          ? 'bg-neutral-950 text-white dark:bg-white dark:text-black shadow-2xs'
+                          : 'bg-neutral-100 text-neutral-800 dark:bg-neutral-800 dark:text-neutral-200 hover:bg-neutral-200 dark:hover:bg-neutral-700'
                       }`}
                     >
                       {tab.label}
@@ -739,42 +769,46 @@ export const AccountView: React.FC = () => {
                 </div>
               </div>
 
-              {/* Orders List */}
+              {/* Orders List Cards */}
               {filteredOrders.length === 0 ? (
-                <div className="py-12 text-center space-y-2">
-                  <p className="text-xs font-medium text-neutral-500">No orders found.</p>
+                <div className="bg-white dark:bg-[#161920] border border-neutral-300/80 dark:border-neutral-800 rounded-2xl py-12 text-center space-y-2 shadow-xs">
+                  <Package className="w-8 h-8 text-neutral-400 mx-auto" />
+                  <p className="text-xs font-bold text-neutral-800 dark:text-neutral-200">No orders found.</p>
                   <button
                     onClick={() => navigateTo('shop')}
-                    className="text-xs text-[#e5341f] font-medium hover:underline cursor-pointer"
+                    className="text-xs text-[#e5341f] font-bold hover:underline cursor-pointer"
                   >
-                    Browse catalog
+                    Browse store catalog
                   </button>
                 </div>
               ) : (
-                <div className="divide-y divide-neutral-100 dark:divide-neutral-800/80">
+                <div className="space-y-3">
                   {filteredOrders.map((ord) => {
                     const stage = getOrderStageDetails(ord.status);
                     const trackingNumber = ord.courierTracking?.trackingNumber || ord.trackingNumber;
-                    const courierName = ord.courierTracking?.courierName || ord.courier || 'Courier';
+                    const courierName = ord.courierTracking?.courierName || ord.courier || 'TCS';
                     const trackingUrl = ord.courierTracking?.trackingUrl;
 
                     return (
-                      <div key={ord.id} className="py-3.5 space-y-2.5">
+                      <div
+                        key={ord.id}
+                        className="bg-white dark:bg-[#161920] border border-neutral-300/80 dark:border-neutral-800 rounded-2xl p-4 shadow-xs space-y-3"
+                      >
                         {/* Order Header Row */}
-                        <div className="flex items-center justify-between text-xs">
+                        <div className="flex items-center justify-between text-xs pb-2.5 border-b border-neutral-200 dark:border-neutral-800">
                           <div className="flex items-center gap-2">
-                            <span className="font-mono font-bold text-neutral-900 dark:text-white">
+                            <span className="font-mono font-black text-sm text-neutral-950 dark:text-white">
                               #{ord.orderNumber}
                             </span>
-                            <span className={`px-2 py-0.5 rounded-full text-[9px] font-semibold border ${stage.badgeClass}`}>
+                            <span className={`px-2.5 py-0.5 rounded-full text-[10px] uppercase tracking-wider border ${stage.badgeClass}`}>
                               {stage.shortText}
                             </span>
                           </div>
                           <div className="flex items-center gap-2">
-                            <span className="text-[11px] text-neutral-400">
-                              {new Date(ord.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                            <span className="text-[11px] text-neutral-600 dark:text-neutral-400 font-semibold">
+                              {new Date(ord.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                             </span>
-                            <span className="font-mono font-bold text-neutral-900 dark:text-white">
+                            <span className="font-mono font-black text-sm text-neutral-950 dark:text-white">
                               {formatPKR(ord.total)}
                             </span>
                           </div>
@@ -782,21 +816,21 @@ export const AccountView: React.FC = () => {
 
                         {/* Courier Tracking Row if assigned */}
                         {trackingNumber && (
-                          <div className="flex items-center justify-between p-2 rounded-lg bg-neutral-50 dark:bg-neutral-900/60 text-xs">
-                            <div className="flex items-center gap-1.5 min-w-0">
-                              <Truck className="w-3.5 h-3.5 text-blue-500 shrink-0" />
-                              <span className="text-[11px] text-neutral-500 dark:text-neutral-400 truncate">
-                                {courierName}: <strong className="font-mono text-neutral-800 dark:text-neutral-200">{trackingNumber}</strong>
+                          <div className="flex items-center justify-between p-2.5 rounded-xl bg-blue-50/80 border border-blue-200 dark:bg-blue-950/40 dark:border-blue-900/60 text-xs">
+                            <div className="flex items-center gap-2 min-w-0">
+                              <Truck className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0" />
+                              <span className="text-xs font-semibold text-neutral-900 dark:text-neutral-100 truncate">
+                                {courierName}: <strong className="font-mono text-blue-700 dark:text-blue-300 font-black">{trackingNumber}</strong>
                               </span>
                               <button
                                 onClick={() => handleCopyTracking(trackingNumber)}
-                                className="text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200 p-0.5 cursor-pointer"
+                                className="text-blue-600 dark:text-blue-300 hover:text-blue-900 p-0.5 cursor-pointer"
                                 title="Copy tracking ID"
                               >
                                 {copiedTrackingId === trackingNumber ? (
-                                  <Check className="w-3 h-3 text-emerald-500" />
+                                  <Check className="w-3.5 h-3.5 text-emerald-600" />
                                 ) : (
-                                  <Copy className="w-3 h-3" />
+                                  <Copy className="w-3.5 h-3.5" />
                                 )}
                               </button>
                             </div>
@@ -805,39 +839,49 @@ export const AccountView: React.FC = () => {
                                 href={trackingUrl}
                                 target="_blank"
                                 rel="noreferrer"
-                                className="text-[11px] text-blue-500 hover:underline flex items-center gap-0.5 shrink-0"
+                                className="text-xs font-bold text-blue-700 dark:text-blue-300 hover:underline flex items-center gap-1 shrink-0"
                               >
                                 <span>Track</span>
-                                <ExternalLink className="w-2.5 h-2.5" />
+                                <ExternalLink className="w-3 h-3" />
                               </a>
                             )}
                           </div>
                         )}
 
                         {/* Order Items */}
-                        <div className="space-y-1.5">
+                        <div className="space-y-2">
                           {ord.items.map((it, idx) => (
                             <div key={idx} className="flex items-center justify-between text-xs">
-                              <div className="flex items-center gap-2.5 min-w-0">
+                              <div className="flex items-center gap-3 min-w-0">
                                 <img
                                   src={it.product.images[0]}
                                   alt={it.product.title}
-                                  className="w-9 h-9 rounded-md object-cover bg-neutral-100 dark:bg-neutral-800 shrink-0"
+                                  className="w-10 h-10 rounded-lg object-cover border border-neutral-200 dark:border-neutral-800 bg-neutral-100 dark:bg-neutral-800 shrink-0"
                                 />
                                 <div className="min-w-0">
-                                  <p className="font-medium text-neutral-900 dark:text-white truncate">
+                                  <p className="font-bold text-neutral-950 dark:text-white truncate">
                                     {it.product.title}
                                   </p>
-                                  <p className="text-[10px] text-neutral-400">
-                                    Size {it.selectedSize} • Qty {it.quantity}
+                                  <p className="text-[11px] text-neutral-600 dark:text-neutral-400 font-medium">
+                                    Size <span className="font-bold text-neutral-900 dark:text-white">{it.selectedSize}</span> • Qty {it.quantity}
                                   </p>
                                 </div>
                               </div>
-                              <span className="font-mono text-neutral-700 dark:text-neutral-300 shrink-0 pl-2">
+                              <span className="font-mono font-bold text-neutral-950 dark:text-white shrink-0 pl-2">
                                 {formatPKR(it.product.price * it.quantity)}
                               </span>
                             </div>
                           ))}
+                        </div>
+
+                        {/* Order Footer Details */}
+                        <div className="pt-2 border-t border-neutral-100 dark:border-neutral-800/80 flex items-center justify-between text-[11px] text-neutral-600 dark:text-neutral-400">
+                          <span className="truncate">
+                            Ship to: <strong className="text-neutral-900 dark:text-neutral-100 font-bold">{ord.customer.fullName}</strong> ({ord.customer.city || 'Pakistan'})
+                          </span>
+                          <span className="uppercase font-bold font-mono px-2 py-0.5 rounded bg-neutral-100 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200">
+                            {ord.paymentMethod === 'cod' ? 'COD' : ord.paymentMethod.toUpperCase()}
+                          </span>
                         </div>
                       </div>
                     );
@@ -855,24 +899,24 @@ export const AccountView: React.FC = () => {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -6 }}
               transition={{ duration: 0.15 }}
-              className="space-y-4"
+              className="space-y-3.5"
             >
               {/* Back to Account Sub-Header */}
-              <div className="flex items-center justify-between pb-2 border-b border-neutral-100 dark:border-neutral-800/80">
+              <div className="bg-white dark:bg-[#161920] border border-neutral-300/80 dark:border-neutral-800 rounded-2xl p-3.5 flex items-center justify-between shadow-xs">
                 <button
                   onClick={() => setActiveTab('overview')}
-                  className="inline-flex items-center gap-1.5 text-xs font-medium text-neutral-600 dark:text-neutral-400 hover:text-black dark:hover:text-white transition-colors cursor-pointer"
+                  className="inline-flex items-center gap-1.5 text-xs font-bold text-neutral-800 dark:text-neutral-200 hover:text-black dark:hover:text-white transition-colors cursor-pointer"
                 >
-                  <ArrowLeft className="w-3.5 h-3.5" />
+                  <ArrowLeft className="w-4 h-4" />
                   <span>Account</span>
                 </button>
-                <h3 className="text-xs font-semibold text-neutral-900 dark:text-white">
+                <h3 className="text-xs font-extrabold text-neutral-950 dark:text-white uppercase tracking-wider">
                   Shipping Addresses
                 </h3>
                 <div className="w-12" />
               </div>
 
-              <div className="pt-1">
+              <div className="bg-white dark:bg-[#161920] border border-neutral-300/80 dark:border-neutral-800 rounded-2xl p-4 shadow-xs">
                 <AddressManager />
               </div>
             </motion.div>
@@ -886,140 +930,146 @@ export const AccountView: React.FC = () => {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -6 }}
               transition={{ duration: 0.15 }}
-              className="space-y-4"
+              className="space-y-3.5"
             >
               {/* Back to Account Sub-Header */}
-              <div className="flex items-center justify-between pb-2 border-b border-neutral-100 dark:border-neutral-800/80">
+              <div className="bg-white dark:bg-[#161920] border border-neutral-300/80 dark:border-neutral-800 rounded-2xl p-3.5 flex items-center justify-between shadow-xs">
                 <button
                   onClick={() => setActiveTab('overview')}
-                  className="inline-flex items-center gap-1.5 text-xs font-medium text-neutral-600 dark:text-neutral-400 hover:text-black dark:hover:text-white transition-colors cursor-pointer"
+                  className="inline-flex items-center gap-1.5 text-xs font-bold text-neutral-800 dark:text-neutral-200 hover:text-black dark:hover:text-white transition-colors cursor-pointer"
                 >
-                  <ArrowLeft className="w-3.5 h-3.5" />
+                  <ArrowLeft className="w-4 h-4" />
                   <span>Account</span>
                 </button>
-                <h3 className="text-xs font-semibold text-neutral-900 dark:text-white">
+                <h3 className="text-xs font-extrabold text-neutral-950 dark:text-white uppercase tracking-wider">
                   Security & Password
                 </h3>
                 <div className="w-12" />
               </div>
 
-              {/* Google Linked Notice */}
-              {(currentCustomer.authProvider === 'google' || profile?.auth_provider === 'google') && (
-                <div className="p-3 rounded-lg bg-neutral-50 dark:bg-neutral-900/60 flex items-center justify-between text-xs">
-                  <div className="flex items-center gap-2">
-                    <svg className="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24">
-                      <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
-                      <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
-                      <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" />
-                      <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" />
-                    </svg>
-                    <span className="text-[11px] text-neutral-600 dark:text-neutral-300">
-                      Google identity linked (<span className="font-mono">{activeEmail}</span>)
+              <div className="bg-white dark:bg-[#161920] border border-neutral-300/80 dark:border-neutral-800 rounded-2xl p-4 sm:p-5 shadow-xs space-y-4">
+                {/* Google Linked Notice */}
+                {(currentCustomer.authProvider === 'google' || profile?.auth_provider === 'google') && (
+                  <div className="p-3 rounded-xl bg-blue-50/80 border border-blue-200 dark:bg-blue-950/40 dark:border-blue-900/60 flex items-center justify-between text-xs">
+                    <div className="flex items-center gap-2.5">
+                      <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24">
+                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" />
+                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" />
+                      </svg>
+                      <span className="text-xs font-bold text-neutral-900 dark:text-neutral-100">
+                        Google account linked (<span className="font-mono font-bold">{activeEmail}</span>)
+                      </span>
+                    </div>
+                    <span className="text-[10px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-wider bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
+                      Active
                     </span>
                   </div>
-                  <span className="text-[9px] font-bold text-emerald-500 uppercase tracking-wider">
-                    Active
-                  </span>
-                </div>
-              )}
+                )}
 
-              {/* Password Form */}
-              <form onSubmit={handleChangePassword} className="space-y-3 pt-1">
-                {(currentCustomer.passwordHash && currentCustomer.authProvider !== 'google') && (
-                  <div>
-                    <label className="block text-[10px] font-medium uppercase tracking-wider text-neutral-400 mb-1">
-                      Current Password
-                    </label>
-                    <div className="relative">
+                {/* Password Form */}
+                <form onSubmit={handleChangePassword} className="space-y-3.5">
+                  <h4 className="text-xs font-black text-neutral-950 dark:text-white uppercase tracking-wider">
+                    {currentCustomer.passwordHash || currentCustomer.hasPassword ? 'Change Password' : 'Set Account Password'}
+                  </h4>
+
+                  {(currentCustomer.passwordHash && currentCustomer.authProvider !== 'google') && (
+                    <div>
+                      <label className="block text-[11px] font-bold uppercase tracking-wider text-neutral-800 dark:text-neutral-200 mb-1">
+                        Current Password
+                      </label>
+                      <div className="relative">
+                        <input
+                          type={showCurrentPw ? 'text' : 'password'}
+                          required
+                          value={currentPassword}
+                          onChange={(e) => setCurrentPassword(e.target.value)}
+                          className="w-full h-8.5 px-3 pr-9 rounded-xl border border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-900 text-xs font-semibold text-neutral-950 dark:text-white focus:outline-none focus:border-neutral-800 dark:focus:border-neutral-300"
+                          placeholder="Current password"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowCurrentPw(!showCurrentPw)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-200"
+                        >
+                          {showCurrentPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-[11px] font-bold uppercase tracking-wider text-neutral-800 dark:text-neutral-200 mb-1">
+                        {currentCustomer.passwordHash || currentCustomer.hasPassword ? 'New Password' : 'Create Password'}
+                      </label>
+                      <div className="relative">
+                        <input
+                          type={showNewPw ? 'text' : 'password'}
+                          required
+                          value={newPassword}
+                          onChange={(e) => { setNewPassword(e.target.value); setPasswordError(''); setPasswordSuccess(false); }}
+                          className="w-full h-8.5 px-3 pr-9 rounded-xl border border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-900 text-xs font-semibold text-neutral-950 dark:text-white focus:outline-none focus:border-neutral-800 dark:focus:border-neutral-300"
+                          placeholder="Min 6 characters"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowNewPw(!showNewPw)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-200"
+                        >
+                          {showNewPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        </button>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-[11px] font-bold uppercase tracking-wider text-neutral-800 dark:text-neutral-200 mb-1">
+                        Confirm Password
+                      </label>
                       <input
-                        type={showCurrentPw ? 'text' : 'password'}
+                        type="password"
                         required
-                        value={currentPassword}
-                        onChange={(e) => setCurrentPassword(e.target.value)}
-                        className="w-full h-8 px-2.5 pr-8 rounded-lg border border-neutral-200 dark:border-neutral-800 bg-transparent text-xs text-neutral-900 dark:text-white focus:outline-none focus:border-neutral-400 dark:focus:border-neutral-600"
-                        placeholder="Current password"
+                        value={confirmPassword}
+                        onChange={(e) => { setConfirmPassword(e.target.value); setPasswordError(''); }}
+                        className="w-full h-8.5 px-3 rounded-xl border border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-900 text-xs font-semibold text-neutral-950 dark:text-white focus:outline-none focus:border-neutral-800 dark:focus:border-neutral-300"
+                        placeholder="Confirm password"
                       />
-                      <button
-                        type="button"
-                        onClick={() => setShowCurrentPw(!showCurrentPw)}
-                        className="absolute right-2 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200"
-                      >
-                        {showCurrentPw ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
-                      </button>
                     </div>
                   </div>
-                )}
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                  <div>
-                    <label className="block text-[10px] font-medium uppercase tracking-wider text-neutral-400 mb-1">
-                      {currentCustomer.passwordHash || currentCustomer.hasPassword ? 'New Password' : 'Create Password'}
-                    </label>
-                    <div className="relative">
-                      <input
-                        type={showNewPw ? 'text' : 'password'}
-                        required
-                        value={newPassword}
-                        onChange={(e) => { setNewPassword(e.target.value); setPasswordError(''); setPasswordSuccess(false); }}
-                        className="w-full h-8 px-2.5 pr-8 rounded-lg border border-neutral-200 dark:border-neutral-800 bg-transparent text-xs text-neutral-900 dark:text-white focus:outline-none focus:border-neutral-400 dark:focus:border-neutral-600"
-                        placeholder="Min 6 characters"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowNewPw(!showNewPw)}
-                        className="absolute right-2 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200"
-                      >
-                        {showNewPw ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
-                      </button>
-                    </div>
+                  {passwordError && (
+                    <p className="text-xs text-red-600 dark:text-red-400 font-bold">{passwordError}</p>
+                  )}
+
+                  {passwordSuccess && (
+                    <p className="text-xs text-emerald-600 dark:text-emerald-400 font-bold">Password updated successfully.</p>
+                  )}
+
+                  <div className="pt-1">
+                    <button
+                      type="submit"
+                      disabled={isChangingPw}
+                      className="h-8.5 px-5 rounded-xl bg-neutral-950 hover:bg-neutral-800 dark:bg-white dark:hover:bg-neutral-200 text-white dark:text-black text-xs font-bold transition-colors cursor-pointer disabled:opacity-50 shadow-2xs"
+                    >
+                      {isChangingPw ? 'Saving...' : 'Update Password'}
+                    </button>
                   </div>
+                </form>
 
+                {/* Device Session & Sign Out */}
+                <div className="pt-3 border-t border-neutral-200 dark:border-neutral-800 flex items-center justify-between">
                   <div>
-                    <label className="block text-[10px] font-medium uppercase tracking-wider text-neutral-400 mb-1">
-                      Confirm Password
-                    </label>
-                    <input
-                      type="password"
-                      required
-                      value={confirmPassword}
-                      onChange={(e) => { setConfirmPassword(e.target.value); setPasswordError(''); }}
-                      className="w-full h-8 px-2.5 rounded-lg border border-neutral-200 dark:border-neutral-800 bg-transparent text-xs text-neutral-900 dark:text-white focus:outline-none focus:border-neutral-400 dark:focus:border-neutral-600"
-                      placeholder="Confirm password"
-                    />
+                    <p className="text-xs font-bold text-neutral-950 dark:text-white">Active Device Session</p>
+                    <p className="text-[11px] text-neutral-600 dark:text-neutral-400 font-medium">Logged in on this device</p>
                   </div>
-                </div>
-
-                {passwordError && (
-                  <p className="text-[11px] text-red-500 font-medium">{passwordError}</p>
-                )}
-
-                {passwordSuccess && (
-                  <p className="text-[11px] text-emerald-500 font-medium">Password updated successfully.</p>
-                )}
-
-                <div className="pt-1">
                   <button
-                    type="submit"
-                    disabled={isChangingPw}
-                    className="h-8 px-4 rounded-lg bg-neutral-900 hover:bg-neutral-800 dark:bg-white dark:hover:bg-neutral-200 text-white dark:text-black text-xs font-medium transition-colors cursor-pointer disabled:opacity-50"
+                    onClick={logoutCustomer}
+                    className="h-8 px-3 rounded-xl border border-red-300 dark:border-red-900 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/20 text-xs font-bold transition-colors cursor-pointer"
                   >
-                    {isChangingPw ? 'Saving...' : 'Update Password'}
+                    Sign Out
                   </button>
                 </div>
-              </form>
-
-              {/* Device Session & Sign Out */}
-              <div className="pt-3 border-t border-neutral-100 dark:border-neutral-800/80 flex items-center justify-between">
-                <div>
-                  <p className="text-xs font-medium text-neutral-900 dark:text-white">Active Session</p>
-                  <p className="text-[10px] text-neutral-400">Current device logged in</p>
-                </div>
-                <button
-                  onClick={logoutCustomer}
-                  className="h-7 px-3 rounded-lg border border-neutral-200 dark:border-neutral-800 text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 text-xs font-medium transition-colors cursor-pointer"
-                >
-                  Sign Out
-                </button>
               </div>
             </motion.div>
           )}
