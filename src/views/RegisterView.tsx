@@ -240,10 +240,9 @@ export const RegisterView: React.FC = () => {
                   name="fullName"
                   type="text"
                   required
-                  placeholder="e.g. Zainab Malik"
                   value={formData.fullName}
                   onChange={handleChange}
-                  className="w-full pl-10 pr-3 py-2.5 bg-neutral-50/50 border border-neutral-200 hover:border-neutral-300 focus:border-[#0a0a0a] rounded-xl text-xs text-[#0a0a0a] placeholder:text-neutral-400 focus:outline-none focus:bg-white focus:ring-2 focus:ring-neutral-100 transition-all"
+                  className="w-full pl-10 pr-3 py-2.5 bg-neutral-50/50 border border-neutral-200 hover:border-neutral-300 focus:border-[#0a0a0a] rounded-xl text-xs text-[#0a0a0a] focus:outline-none focus:bg-white focus:ring-2 focus:ring-neutral-100 transition-all"
                 />
               </div>
             </div>
@@ -266,10 +265,9 @@ export const RegisterView: React.FC = () => {
                   type="email"
                   autoComplete="email"
                   required
-                  placeholder="you@example.com"
                   value={formData.email}
                   onChange={handleChange}
-                  className="w-full pl-10 pr-3 py-2.5 bg-neutral-50/50 border border-neutral-200 hover:border-neutral-300 focus:border-[#0a0a0a] rounded-xl text-xs text-[#0a0a0a] placeholder:text-neutral-400 focus:outline-none focus:bg-white focus:ring-2 focus:ring-neutral-100 transition-all"
+                  className="w-full pl-10 pr-3 py-2.5 bg-neutral-50/50 border border-neutral-200 hover:border-neutral-300 focus:border-[#0a0a0a] rounded-xl text-xs text-[#0a0a0a] focus:outline-none focus:bg-white focus:ring-2 focus:ring-neutral-100 transition-all"
                 />
               </div>
             </div>
@@ -291,10 +289,9 @@ export const RegisterView: React.FC = () => {
                   name="phone"
                   type="tel"
                   autoComplete="tel"
-                  placeholder="+92 300 1234567"
                   value={formData.phone}
                   onChange={handleChange}
-                  className="w-full pl-10 pr-3 py-2.5 bg-neutral-50/50 border border-neutral-200 hover:border-neutral-300 focus:border-[#0a0a0a] rounded-xl text-xs text-[#0a0a0a] placeholder:text-neutral-400 focus:outline-none focus:bg-white focus:ring-2 focus:ring-neutral-100 transition-all"
+                  className="w-full pl-10 pr-3 py-2.5 bg-neutral-50/50 border border-neutral-200 hover:border-neutral-300 focus:border-[#0a0a0a] rounded-xl text-xs text-[#0a0a0a] focus:outline-none focus:bg-white focus:ring-2 focus:ring-neutral-100 transition-all"
                 />
               </div>
             </div>
@@ -317,10 +314,9 @@ export const RegisterView: React.FC = () => {
                   type={showPassword ? 'text' : 'password'}
                   autoComplete="new-password"
                   required
-                  placeholder="Minimum 8 characters"
                   value={formData.password}
                   onChange={handleChange}
-                  className="w-full pl-10 pr-10 py-2.5 bg-neutral-50/50 border border-neutral-200 hover:border-neutral-300 focus:border-[#0a0a0a] rounded-xl text-xs text-[#0a0a0a] placeholder:text-neutral-400 focus:outline-none focus:bg-white focus:ring-2 focus:ring-neutral-100 transition-all"
+                  className="w-full pl-10 pr-10 py-2.5 bg-neutral-50/50 border border-neutral-200 hover:border-neutral-300 focus:border-[#0a0a0a] rounded-xl text-xs text-[#0a0a0a] focus:outline-none focus:bg-white focus:ring-2 focus:ring-neutral-100 transition-all"
                 />
                 <button
                   type="button"
@@ -351,10 +347,9 @@ export const RegisterView: React.FC = () => {
                   type={showConfirmPassword ? 'text' : 'password'}
                   autoComplete="new-password"
                   required
-                  placeholder="Re-enter your password"
                   value={formData.confirmPassword}
                   onChange={handleChange}
-                  className="w-full pl-10 pr-10 py-2.5 bg-neutral-50/50 border border-neutral-200 hover:border-neutral-300 focus:border-[#0a0a0a] rounded-xl text-xs text-[#0a0a0a] placeholder:text-neutral-400 focus:outline-none focus:bg-white focus:ring-2 focus:ring-neutral-100 transition-all"
+                  className="w-full pl-10 pr-10 py-2.5 bg-neutral-50/50 border border-neutral-200 hover:border-neutral-300 focus:border-[#0a0a0a] rounded-xl text-xs text-[#0a0a0a] focus:outline-none focus:bg-white focus:ring-2 focus:ring-neutral-100 transition-all"
                 />
                 <button
                   type="button"

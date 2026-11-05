@@ -182,13 +182,12 @@ export const LoginView: React.FC = () => {
                   type="email"
                   autoComplete="email"
                   required
-                  placeholder="you@example.com"
                   value={email}
                   onChange={(e) => {
                     setEmail(e.target.value);
                     if (error) setError(null);
                   }}
-                  className="w-full pl-10 pr-3 py-2.5 bg-neutral-50/50 border border-neutral-200 hover:border-neutral-300 focus:border-[#0a0a0a] rounded-xl text-xs text-[#0a0a0a] placeholder:text-neutral-400 focus:outline-none focus:bg-white focus:ring-2 focus:ring-neutral-100 transition-all"
+                  className="w-full pl-10 pr-3 py-2.5 bg-neutral-50/50 border border-neutral-200 hover:border-neutral-300 focus:border-[#0a0a0a] rounded-xl text-xs text-[#0a0a0a] focus:outline-none focus:bg-white focus:ring-2 focus:ring-neutral-100 transition-all"
                 />
               </div>
             </div>
@@ -220,13 +219,12 @@ export const LoginView: React.FC = () => {
                   type={showPassword ? 'text' : 'password'}
                   autoComplete="current-password"
                   required
-                  placeholder="Enter your password"
                   value={password}
                   onChange={(e) => {
                     setPassword(e.target.value);
                     if (error) setError(null);
                   }}
-                  className="w-full pl-10 pr-10 py-2.5 bg-neutral-50/50 border border-neutral-200 hover:border-neutral-300 focus:border-[#0a0a0a] rounded-xl text-xs text-[#0a0a0a] placeholder:text-neutral-400 focus:outline-none focus:bg-white focus:ring-2 focus:ring-neutral-100 transition-all"
+                  className="w-full pl-10 pr-10 py-2.5 bg-neutral-50/50 border border-neutral-200 hover:border-neutral-300 focus:border-[#0a0a0a] rounded-xl text-xs text-[#0a0a0a] focus:outline-none focus:bg-white focus:ring-2 focus:ring-neutral-100 transition-all"
                 />
                 <button
                   type="button"
