@@ -3,12 +3,14 @@ import { ShoppingBag, Eye, Check, AlertCircle, Plus } from 'lucide-react';
 import { Product } from '../types';
 import { useStore } from '../context/StoreContext';
 import { formatPKR } from '../utils/format';
+import { getHighFidelityImageUrl, getRetinaSrcSet } from '../utils/image';
 
 interface ProductCardProps {
   product: Product;
+  priority?: boolean;
 }
 
-export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
+export const ProductCard: React.FC<ProductCardProps> = ({ product, priority = false }) => {
   const { navigateTo, addToCart, setQuickViewProduct } = useStore();
 
   const handleCardClick = () => {
@@ -37,11 +39,17 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       {/* Top Image Container with Consistent 4:5 Portrait Ratio */}
       <div className="relative aspect-[4/5] bg-[#f4f4f4] overflow-hidden w-full">
         <img
-          src={product.images[0]}
+          src={getHighFidelityImageUrl(product.images[0], { width: 600, quality: 85 })}
+          srcSet={getRetinaSrcSet(product.images[0], 500, 85) || undefined}
+          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
           alt={product.title}
+          width={400}
+          height={500}
+          decoding="async"
           referrerPolicy="no-referrer"
           className="w-full h-full object-cover object-center transition-transform duration-500 ease-out group-hover:scale-105"
-          loading="lazy"
+          loading={priority ? 'eager' : 'lazy'}
+          {...(priority ? { fetchPriority: 'high' } : {})}
         />
 
         {/* Badges Overlay */}

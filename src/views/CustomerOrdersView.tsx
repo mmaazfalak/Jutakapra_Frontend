@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   ShoppingBag,
   Truck,
@@ -31,7 +31,11 @@ import { formatPKR } from '../utils/format';
 import { Order, OrderStatus } from '../types';
 
 export const CustomerOrdersView: React.FC = () => {
-  const { orders, currentCustomer, profile, navigateTo, openAuthModal, addToast } = useStore();
+  const { orders, currentCustomer, profile, navigateTo, openAuthModal, addToast, refreshOrders } = useStore();
+
+  useEffect(() => {
+    refreshOrders();
+  }, [refreshOrders]);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState<'all' | 'processing' | 'dispatched' | 'delivered'>('all');

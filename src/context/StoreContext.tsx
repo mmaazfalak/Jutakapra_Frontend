@@ -1096,8 +1096,18 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       }
     };
     restoreSession();
-    refreshUsersList();
-    refreshOrders();
+
+    // Non-blocking background sync of products after initial paint (0ms latency for user)
+    setTimeout(() => {
+      safeFetchJson<any>('/api/products', { method: 'GET' }).then((prodRes) => {
+        if (prodRes.ok && Array.isArray(prodRes.data) && prodRes.data.length > 0) {
+          setProducts(prodRes.data);
+          try {
+            localStorage.setItem(STORAGE_KEYS.PRODUCTS, JSON.stringify(prodRes.data));
+          } catch {}
+        }
+      }).catch(() => {});
+    }, 1200);
   }, []);
 
   // Supabase Auth Listener & Bootstrap (Reactive Profile & Avatar)

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, Suspense, lazy } from 'react';
 import { StoreProvider, useStore } from './context/StoreContext';
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
@@ -8,29 +8,40 @@ import { ToastContainer } from './components/ToastContainer';
 import { CommandKModal } from './components/CommandKModal';
 import { FloatingCartButton } from './components/FloatingCartButton';
 import { MobileAppNavBar } from './components/MobileAppNavBar';
-
-// Customer Storefront Views
-import { HomeView } from './views/HomeView';
-import { ShopView } from './views/ShopView';
-import { ProductDetailView } from './views/ProductDetailView';
-import { CartView } from './views/CartView';
-import { CheckoutView } from './views/CheckoutView';
-import { ConditionGuideView } from './views/ConditionGuideView';
-import { DropsView } from './views/DropsView';
-import { ContactView } from './views/ContactView';
-import { CustomerOrdersView } from './views/CustomerOrdersView';
-import { AccountView } from './views/AccountView';
-import { RegisterView } from './views/RegisterView';
-import { LoginView } from './views/LoginView';
-import { ForgotPasswordView } from './views/ForgotPasswordView';
-import { VerifyOtpView } from './views/VerifyOtpView';
-import { ResetPasswordView } from './views/ResetPasswordView';
-import { ProfileEditView } from './views/ProfileEditView';
-import { ChangePasswordView } from './views/ChangePasswordView';
 import { CheckoutGateModal } from './components/CheckoutGateModal';
 import { GoogleSetupPasswordModal } from './components/GoogleSetupPasswordModal';
 
+// HomeView is loaded eagerly for instant above-the-fold First Contentful Paint
+import { HomeView } from './views/HomeView';
+
+// Route-based code-splitting: Other views load lazily on demand
+const ShopView = lazy(() => import('./views/ShopView').then((m) => ({ default: m.ShopView })));
+const ProductDetailView = lazy(() => import('./views/ProductDetailView').then((m) => ({ default: m.ProductDetailView })));
+const CartView = lazy(() => import('./views/CartView').then((m) => ({ default: m.CartView })));
+const CheckoutView = lazy(() => import('./views/CheckoutView').then((m) => ({ default: m.CheckoutView })));
+const ConditionGuideView = lazy(() => import('./views/ConditionGuideView').then((m) => ({ default: m.ConditionGuideView })));
+const DropsView = lazy(() => import('./views/DropsView').then((m) => ({ default: m.DropsView })));
+const ContactView = lazy(() => import('./views/ContactView').then((m) => ({ default: m.ContactView })));
+const CustomerOrdersView = lazy(() => import('./views/CustomerOrdersView').then((m) => ({ default: m.CustomerOrdersView })));
+const AccountView = lazy(() => import('./views/AccountView').then((m) => ({ default: m.AccountView })));
+const RegisterView = lazy(() => import('./views/RegisterView').then((m) => ({ default: m.RegisterView })));
+const LoginView = lazy(() => import('./views/LoginView').then((m) => ({ default: m.LoginView })));
+const ForgotPasswordView = lazy(() => import('./views/ForgotPasswordView').then((m) => ({ default: m.ForgotPasswordView })));
+const VerifyOtpView = lazy(() => import('./views/VerifyOtpView').then((m) => ({ default: m.VerifyOtpView })));
+const ResetPasswordView = lazy(() => import('./views/ResetPasswordView').then((m) => ({ default: m.ResetPasswordView })));
+const ProfileEditView = lazy(() => import('./views/ProfileEditView').then((m) => ({ default: m.ProfileEditView })));
+const ChangePasswordView = lazy(() => import('./views/ChangePasswordView').then((m) => ({ default: m.ChangePasswordView })));
+
 const ADMIN_URL = import.meta.env.VITE_ADMIN_URL || 'https://jutakaprabackend.vercel.app';
+
+const ViewSkeleton: React.FC = () => (
+  <div className="min-h-[50vh] flex flex-col items-center justify-center p-8 bg-white dark:bg-[#0a0a0a]">
+    <div className="w-8 h-8 border-2 border-[#0a0a0a] dark:border-white border-t-transparent rounded-full animate-spin" />
+    <span className="text-[11px] font-bold tracking-widest uppercase text-neutral-400 mt-4 font-mono">
+      Loading Vault...
+    </span>
+  </div>
+);
 
 const MainApp: React.FC = () => {
   const { currentView } = useStore();
@@ -107,7 +118,9 @@ const MainApp: React.FC = () => {
   return (
     <div className="min-h-screen flex flex-col bg-white text-[#0a0a0a]">
       <Header />
-      <main className="flex-grow pb-24 md:pb-0">{renderView()}</main>
+      <main className="flex-grow pb-24 md:pb-0">
+        <Suspense fallback={<ViewSkeleton />}>{renderView()}</Suspense>
+      </main>
       <Footer />
       <CartDrawer />
       <QuickViewModal />

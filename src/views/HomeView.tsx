@@ -112,7 +112,7 @@ export const HomeView: React.FC = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           {trendingProducts.map((prod, idx) => (
             <div key={prod.id} className={idx === 3 ? 'hidden sm:block' : 'block'}>
-              <ProductCard product={prod} />
+              <ProductCard product={prod} priority={idx < 2} />
             </div>
           ))}
         </div>
