@@ -68,7 +68,6 @@ export const AddressManager: React.FC<AddressManagerProps> = ({
     // Direct persistence to Supabase public.profiles table
     if (formData.isDefault || addresses.length === 0) {
       await updateProfile({
-        address: formData.address,
         default_shipping_address: formData.address,
         city: formData.city,
         state: formData.state,

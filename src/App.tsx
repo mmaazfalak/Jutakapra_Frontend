@@ -13,23 +13,48 @@ import { CheckoutGateModal } from './components/CheckoutGateModal';
 // HomeView is loaded eagerly for instant above-the-fold First Contentful Paint
 import { HomeView } from './views/HomeView';
 
-// Route-based code-splitting: Other views load lazily on demand
-const ShopView = lazy(() => import('./views/ShopView').then((m) => ({ default: m.ShopView })));
-const ProductDetailView = lazy(() => import('./views/ProductDetailView').then((m) => ({ default: m.ProductDetailView })));
-const CartView = lazy(() => import('./views/CartView').then((m) => ({ default: m.CartView })));
-const CheckoutView = lazy(() => import('./views/CheckoutView').then((m) => ({ default: m.CheckoutView })));
-const ConditionGuideView = lazy(() => import('./views/ConditionGuideView').then((m) => ({ default: m.ConditionGuideView })));
-const DropsView = lazy(() => import('./views/DropsView').then((m) => ({ default: m.DropsView })));
-const ContactView = lazy(() => import('./views/ContactView').then((m) => ({ default: m.ContactView })));
-const CustomerOrdersView = lazy(() => import('./views/CustomerOrdersView').then((m) => ({ default: m.CustomerOrdersView })));
-const AccountView = lazy(() => import('./views/AccountView').then((m) => ({ default: m.AccountView })));
-const RegisterView = lazy(() => import('./views/RegisterView').then((m) => ({ default: m.RegisterView })));
-const LoginView = lazy(() => import('./views/LoginView').then((m) => ({ default: m.LoginView })));
-const ForgotPasswordView = lazy(() => import('./views/ForgotPasswordView').then((m) => ({ default: m.ForgotPasswordView })));
-const VerifyOtpView = lazy(() => import('./views/VerifyOtpView').then((m) => ({ default: m.VerifyOtpView })));
-const ResetPasswordView = lazy(() => import('./views/ResetPasswordView').then((m) => ({ default: m.ResetPasswordView })));
-const ProfileEditView = lazy(() => import('./views/ProfileEditView').then((m) => ({ default: m.ProfileEditView })));
-const ChangePasswordView = lazy(() => import('./views/ChangePasswordView').then((m) => ({ default: m.ChangePasswordView })));
+// Auto-retry wrapper for dynamic imports to seamlessly handle post-deployment chunk hash changes
+function lazyWithRetry<T extends React.ComponentType<any>>(factory: () => Promise<{ default: T }>) {
+  return lazy(async () => {
+    const hasReloaded = typeof window !== 'undefined' ? sessionStorage.getItem('chunk_reloaded') : null;
+    try {
+      const module = await factory();
+      if (typeof window !== 'undefined') sessionStorage.removeItem('chunk_reloaded');
+      return module;
+    } catch (err: any) {
+      const isChunkError =
+        err?.message?.includes('dynamically imported module') ||
+        err?.message?.includes('Failed to fetch') ||
+        err?.message?.includes('module script') ||
+        err?.name === 'ChunkLoadError' ||
+        err instanceof TypeError;
+      if (!hasReloaded && isChunkError && typeof window !== 'undefined') {
+        sessionStorage.setItem('chunk_reloaded', 'true');
+        window.location.reload();
+        return new Promise<{ default: T }>(() => {});
+      }
+      throw err;
+    }
+  });
+}
+
+// Route-based code-splitting: Views load lazily on demand with auto-recovery from stale builds
+const ShopView = lazyWithRetry(() => import('./views/ShopView').then((m) => ({ default: m.ShopView })));
+const ProductDetailView = lazyWithRetry(() => import('./views/ProductDetailView').then((m) => ({ default: m.ProductDetailView })));
+const CartView = lazyWithRetry(() => import('./views/CartView').then((m) => ({ default: m.CartView })));
+const CheckoutView = lazyWithRetry(() => import('./views/CheckoutView').then((m) => ({ default: m.CheckoutView })));
+const ConditionGuideView = lazyWithRetry(() => import('./views/ConditionGuideView').then((m) => ({ default: m.ConditionGuideView })));
+const DropsView = lazyWithRetry(() => import('./views/DropsView').then((m) => ({ default: m.DropsView })));
+const ContactView = lazyWithRetry(() => import('./views/ContactView').then((m) => ({ default: m.ContactView })));
+const CustomerOrdersView = lazyWithRetry(() => import('./views/CustomerOrdersView').then((m) => ({ default: m.CustomerOrdersView })));
+const AccountView = lazyWithRetry(() => import('./views/AccountView').then((m) => ({ default: m.AccountView })));
+const RegisterView = lazyWithRetry(() => import('./views/RegisterView').then((m) => ({ default: m.RegisterView })));
+const LoginView = lazyWithRetry(() => import('./views/LoginView').then((m) => ({ default: m.LoginView })));
+const ForgotPasswordView = lazyWithRetry(() => import('./views/ForgotPasswordView').then((m) => ({ default: m.ForgotPasswordView })));
+const VerifyOtpView = lazyWithRetry(() => import('./views/VerifyOtpView').then((m) => ({ default: m.VerifyOtpView })));
+const ResetPasswordView = lazyWithRetry(() => import('./views/ResetPasswordView').then((m) => ({ default: m.ResetPasswordView })));
+const ProfileEditView = lazyWithRetry(() => import('./views/ProfileEditView').then((m) => ({ default: m.ProfileEditView })));
+const ChangePasswordView = lazyWithRetry(() => import('./views/ChangePasswordView').then((m) => ({ default: m.ChangePasswordView })));
 
 const ADMIN_URL = import.meta.env.VITE_ADMIN_URL || 'https://jutakaprabackend.vercel.app';
 

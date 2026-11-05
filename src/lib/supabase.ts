@@ -38,6 +38,39 @@ export const supabase: SupabaseClient = createClient(
   }
 );
 
+export const VALID_PROFILE_COLUMNS = new Set([
+  'id',
+  'full_name',
+  'email',
+  'avatar_url',
+  'phone',
+  'auth_provider',
+  'role',
+  'status',
+  'default_shipping_address',
+  'city',
+  'state',
+  'postal_code',
+  'country',
+  'created_at',
+  'last_login_at',
+]);
+
+/**
+ * Filter out any non-existent columns before upserting into public.profiles
+ */
+export const sanitizeProfilePayload = (data: Record<string, any>): Record<string, any> => {
+  const sanitized: Record<string, any> = {};
+  for (const [key, val] of Object.entries(data)) {
+    if ((key === 'address' || key === 'defaultShippingAddress') && !sanitized.default_shipping_address && val) {
+      sanitized.default_shipping_address = val;
+    } else if (VALID_PROFILE_COLUMNS.has(key) && val !== undefined) {
+      sanitized[key] = val;
+    }
+  }
+  return sanitized;
+};
+
 // Helper to convert Supabase User & Profile into application Customer object with address persistence
 export const profileToCustomer = (profile: SupabaseProfile, fallbackUser?: SupabaseUser | null): Customer => {
   const addresses: any[] = [];
@@ -176,7 +209,7 @@ export const syncSupabaseUserProfile = async (
 
   const finalPhone = existingProfile?.phone || newPhone || '';
 
-  const profilePayload: Partial<SupabaseProfile> & { id: string; email: string } = {
+  const rawPayload: Record<string, any> = {
     id: user.id,
     email: (user.email || '').toLowerCase().trim(),
     full_name: finalFullName,
@@ -185,7 +218,7 @@ export const syncSupabaseUserProfile = async (
     auth_provider: provider === 'google' ? 'google' : (existingProfile?.auth_provider || 'email'),
     role: (user.email?.toLowerCase() === 'mmaazfalak@icloud.com') ? 'admin' : (existingProfile?.role || customData?.role || 'customer'),
     status: existingProfile?.status || 'active',
-    default_shipping_address: customData?.defaultShippingAddress || customData?.address || existingProfile?.default_shipping_address || existingProfile?.address,
+    default_shipping_address: customData?.defaultShippingAddress || customData?.address || existingProfile?.default_shipping_address,
     city: customData?.city || existingProfile?.city,
     state: customData?.state || existingProfile?.state,
     postal_code: customData?.postalCode || existingProfile?.postal_code,
@@ -193,12 +226,14 @@ export const syncSupabaseUserProfile = async (
     last_login_at: new Date().toISOString(),
   };
 
+  const profilePayload = sanitizeProfilePayload(rawPayload);
+
   try {
     const { data, error } = await supabase
       .from('profiles')
       .upsert(profilePayload, { onConflict: 'id' })
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) {
       console.warn('Failed to upsert Supabase profile:', error.message);
@@ -221,26 +256,18 @@ export const updateSupabaseUserProfile = async (
   if (!isSupabaseConfigured()) return { success: true };
 
   try {
-    const payload: any = {
+    const rawPayload: Record<string, any> = {
       ...updates,
       id: userId,
       last_login_at: new Date().toISOString(),
     };
-
-    if (payload.address) {
-      payload.default_shipping_address = payload.default_shipping_address || payload.address;
-      delete payload.address;
-    }
-    delete payload.has_password;
-    delete payload.password_hash;
-    delete payload.addresses;
-    delete payload.password;
+    const payload = sanitizeProfilePayload(rawPayload);
 
     const { data, error } = await supabase
       .from('profiles')
       .upsert(payload, { onConflict: 'id' })
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) {
       return { success: false, error: error.message };

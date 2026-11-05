@@ -113,7 +113,6 @@ export const CheckoutView: React.FC = () => {
   ) => {
     if (!formAddress.trim()) return;
     await updateProfile({
-      address: formAddress,
       default_shipping_address: formAddress,
       city: formCity,
       state: formState,

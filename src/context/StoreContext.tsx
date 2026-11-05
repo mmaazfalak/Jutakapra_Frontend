@@ -1017,11 +1017,15 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       // 3. Fetch fresh products from backend API if available
       try {
         const prodRes = await safeFetchJson<any>('/api/products', { method: 'GET' });
-        if (prodRes.ok && Array.isArray(prodRes.data) && prodRes.data.length > 0) {
-          setProducts(prodRes.data);
-          try {
-            localStorage.setItem(STORAGE_KEYS.PRODUCTS, JSON.stringify(prodRes.data));
-          } catch {}
+        if (prodRes.ok && prodRes.data) {
+          const raw = prodRes.data;
+          const list = Array.isArray(raw) ? raw : (raw?.products && Array.isArray(raw.products) ? raw.products : []);
+          if (list.length > 0) {
+            setProducts(list);
+            try {
+              localStorage.setItem(STORAGE_KEYS.PRODUCTS, JSON.stringify(list));
+            } catch {}
+          }
         }
       } catch {}
 
@@ -1100,11 +1104,15 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     // Non-blocking background sync of products after initial paint (0ms latency for user)
     setTimeout(() => {
       safeFetchJson<any>('/api/products', { method: 'GET' }).then((prodRes) => {
-        if (prodRes.ok && Array.isArray(prodRes.data) && prodRes.data.length > 0) {
-          setProducts(prodRes.data);
-          try {
-            localStorage.setItem(STORAGE_KEYS.PRODUCTS, JSON.stringify(prodRes.data));
-          } catch {}
+        if (prodRes.ok && prodRes.data) {
+          const raw = prodRes.data;
+          const list = Array.isArray(raw) ? raw : (raw?.products && Array.isArray(raw.products) ? raw.products : []);
+          if (list.length > 0) {
+            setProducts(list);
+            try {
+              localStorage.setItem(STORAGE_KEYS.PRODUCTS, JSON.stringify(list));
+            } catch {}
+          }
         }
       }).catch(() => {});
     }, 1200);
@@ -2124,17 +2132,25 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     let target = currentCustomer || UnifiedStorage.getActiveSession();
     if (!target) return { success: false, error: 'No active session' };
 
+    const sanitizedUpdates = { ...updates };
+    if (sanitizedUpdates.address) {
+      if (!sanitizedUpdates.default_shipping_address) {
+        sanitizedUpdates.default_shipping_address = sanitizedUpdates.address;
+      }
+      delete (sanitizedUpdates as any).address;
+    }
+
     const updatedAddresses = [...(target.addresses || [])];
     const defaultIdx = updatedAddresses.findIndex((a) => a.isDefault);
 
-    if (updates.address || updates.default_shipping_address) {
-      const addrText = updates.address || updates.default_shipping_address || '';
-      const cityText = updates.city || (defaultIdx >= 0 ? updatedAddresses[defaultIdx].city : 'Islamabad');
-      const stateText = updates.state || (defaultIdx >= 0 ? updatedAddresses[defaultIdx].state : 'ICT');
-      const postalText = updates.postal_code || (defaultIdx >= 0 ? updatedAddresses[defaultIdx].postalCode : '44000');
-      const countryText = updates.country || (defaultIdx >= 0 ? updatedAddresses[defaultIdx].country : 'Pakistan');
-      const phoneText = updates.phone || target.phone || '';
-      const nameText = updates.full_name || target.fullName || 'Customer';
+    if (sanitizedUpdates.default_shipping_address) {
+      const addrText = sanitizedUpdates.default_shipping_address || '';
+      const cityText = sanitizedUpdates.city || (defaultIdx >= 0 ? updatedAddresses[defaultIdx].city : 'Islamabad');
+      const stateText = sanitizedUpdates.state || (defaultIdx >= 0 ? updatedAddresses[defaultIdx].state : 'ICT');
+      const postalText = sanitizedUpdates.postal_code || (defaultIdx >= 0 ? updatedAddresses[defaultIdx].postalCode : '44000');
+      const countryText = sanitizedUpdates.country || (defaultIdx >= 0 ? updatedAddresses[defaultIdx].country : 'Pakistan');
+      const phoneText = sanitizedUpdates.phone || target.phone || '';
+      const nameText = sanitizedUpdates.full_name || target.fullName || 'Customer';
 
       if (defaultIdx >= 0) {
         updatedAddresses[defaultIdx] = {
@@ -2173,7 +2189,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       addresses: updatedAddresses,
     };
 
-    setProfile((prev) => (prev ? { ...prev, ...updates, phone: resolvedPhone } : (updates as SupabaseProfile)));
+    setProfile((prev) => (prev ? { ...prev, ...sanitizedUpdates, phone: resolvedPhone } : (sanitizedUpdates as SupabaseProfile)));
     setCurrentCustomer(updatedCust);
     setCustomers((prev) => prev.map((c) => (c.id === updatedCust.id ? updatedCust : c)));
 

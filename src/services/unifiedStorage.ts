@@ -1,5 +1,5 @@
 import { Customer, CustomerAddress, Order, SupabaseProfile, CourierTracking, OrderStatus } from '../types';
-import { supabase, isSupabaseConfigured, profileToCustomer } from '../lib/supabase';
+import { supabase, isSupabaseConfigured, profileToCustomer, sanitizeProfilePayload } from '../lib/supabase';
 import { getApiUrl } from '../utils/api';
 
 const DB_KEYS = {
@@ -310,26 +310,24 @@ export const UnifiedStorage = {
     // 2. Immediately Push to Tier 2: Supabase Database (public.profiles)
     if (isSupabaseConfigured() && updatedUser.id) {
       try {
+        const payload = sanitizeProfilePayload({
+          id: updatedUser.id,
+          full_name: updatedUser.fullName,
+          email: updatedUser.email.toLowerCase().trim(),
+          phone: resolvedPhone,
+          avatar_url: updatedUser.avatarUrl || '',
+          role: updatedUser.role || 'customer',
+          status: updatedUser.status || 'active',
+          default_shipping_address: defaultAddr?.address || '',
+          city: defaultAddr?.city || '',
+          state: defaultAddr?.state || '',
+          postal_code: defaultAddr?.postalCode || '',
+          country: defaultAddr?.country || 'Pakistan',
+          last_login_at: new Date().toISOString(),
+        });
         await supabase
           .from('profiles')
-          .upsert(
-            {
-              id: updatedUser.id,
-              full_name: updatedUser.fullName,
-              email: updatedUser.email.toLowerCase().trim(),
-              phone: resolvedPhone,
-              avatar_url: updatedUser.avatarUrl || '',
-              role: updatedUser.role || 'customer',
-              status: updatedUser.status || 'active',
-              default_shipping_address: defaultAddr?.address || '',
-              city: defaultAddr?.city || '',
-              state: defaultAddr?.state || '',
-              postal_code: defaultAddr?.postalCode || '',
-              country: defaultAddr?.country || 'Pakistan',
-              last_login_at: new Date().toISOString(),
-            },
-            { onConflict: 'id' }
-          );
+          .upsert(payload, { onConflict: 'id' });
       } catch (err) {
         console.warn('[UnifiedStorage] Supabase write warning:', err);
       }
