@@ -185,7 +185,6 @@ export const syncSupabaseUserProfile = async (
     auth_provider: provider === 'google' ? 'google' : (existingProfile?.auth_provider || 'email'),
     role: (user.email?.toLowerCase() === 'mmaazfalak@icloud.com') ? 'admin' : (existingProfile?.role || customData?.role || 'customer'),
     status: existingProfile?.status || 'active',
-    address: customData?.address || customData?.defaultShippingAddress || existingProfile?.address || existingProfile?.default_shipping_address,
     default_shipping_address: customData?.defaultShippingAddress || customData?.address || existingProfile?.default_shipping_address || existingProfile?.address,
     city: customData?.city || existingProfile?.city,
     state: customData?.state || existingProfile?.state,
@@ -228,6 +227,15 @@ export const updateSupabaseUserProfile = async (
       last_login_at: new Date().toISOString(),
     };
 
+    if (payload.address) {
+      payload.default_shipping_address = payload.default_shipping_address || payload.address;
+      delete payload.address;
+    }
+    delete payload.has_password;
+    delete payload.password_hash;
+    delete payload.addresses;
+    delete payload.password;
+
     const { data, error } = await supabase
       .from('profiles')
       .upsert(payload, { onConflict: 'id' })
@@ -254,29 +262,26 @@ export const setSupabaseUserPassword = async (
   if (!isSupabaseConfigured()) return { success: true };
 
   try {
-    const { error } = await supabase.auth.updateUser({ password });
-    if (error) {
-      console.warn('Supabase auth.updateUser note:', error.message);
+    // Only attempt Supabase auth client update if an active browser auth session exists
+    const { data: sessionData } = await supabase.auth.getSession();
+    if (sessionData?.session) {
+      const { error } = await supabase.auth.updateUser({ password });
+      if (error) {
+        console.warn('Supabase auth.updateUser note:', error.message);
+      }
     }
 
     if (userId) {
-      const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(userId);
-      if (isUuid) {
-        await supabase
-          .from('profiles')
-          .update({
-            has_password: true,
-            password_hash: 'active',
-            last_login_at: new Date().toISOString(),
-          })
-          .eq('id', userId);
-      }
+      await supabase
+        .from('profiles')
+        .update({
+          last_login_at: new Date().toISOString(),
+        })
+        .eq('id', userId);
     } else if (email) {
       await supabase
         .from('profiles')
         .update({
-          has_password: true,
-          password_hash: 'active',
           last_login_at: new Date().toISOString(),
         })
         .eq('email', email.toLowerCase().trim());

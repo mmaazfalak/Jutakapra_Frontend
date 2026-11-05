@@ -1663,9 +1663,9 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       }
     }
 
-    // 2. Infallibly Update via Backend Database & Supabase Admin
+    // 2. Infallibly Update via Backend Database & Supabase
     try {
-      await safeFetchJson<any>('/api/auth/change-password', {
+      const res = await safeFetchJson<any>('/api/auth/change-password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -1677,17 +1677,12 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         }),
       });
 
-      await safeFetchJson<any>('/api/auth/profile', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({
-          userId: currentCustomer.id,
-          email: currentCustomer.email,
-          password: newPassword,
-          newPassword: newPassword,
-        }),
-      });
+      if (res.data?.token) {
+        try {
+          localStorage.setItem('juta_token', res.data.token);
+          localStorage.setItem('token', res.data.token);
+        } catch {}
+      }
     } catch (err: any) {
       console.warn('Backend password update error:', err.message);
     }
@@ -2102,13 +2097,17 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     if (fresh) {
       setCurrentCustomer(fresh);
       const defaultAddr = fresh.addresses.find((a) => a.isDefault) || fresh.addresses[0];
-      setProfile({
+      setProfile((prev) => ({
+        ...(prev || {
+          auth_provider: 'email',
+          created_at: new Date().toISOString(),
+          last_login_at: new Date().toISOString(),
+        }),
         id: fresh.id,
         full_name: fresh.fullName,
         email: fresh.email,
         phone: fresh.phone || defaultAddr?.phone || '',
         avatar_url: fresh.avatarUrl,
-        address: defaultAddr?.address || '',
         default_shipping_address: defaultAddr?.address || '',
         city: defaultAddr?.city || '',
         state: defaultAddr?.state || '',
@@ -2116,7 +2115,10 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         country: defaultAddr?.country || 'Pakistan',
         role: fresh.role,
         status: fresh.status,
-      });
+        auth_provider: (fresh.authProvider as any) || prev?.auth_provider || 'email',
+        created_at: prev?.created_at || new Date().toISOString(),
+        last_login_at: prev?.last_login_at || new Date().toISOString(),
+      }));
       setCustomers((prev) => {
         const idx = prev.findIndex((c) => c.id === fresh.id || c.email.toLowerCase() === fresh.email.toLowerCase());
         if (idx >= 0) return prev.map((c, i) => (i === idx ? { ...c, ...fresh } : c));
@@ -2235,6 +2237,12 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       }
 
       if (res.ok && res.data?.success) {
+        if (res.data?.token) {
+          try {
+            localStorage.setItem('juta_token', res.data.token);
+            localStorage.setItem('token', res.data.token);
+          } catch {}
+        }
         if (currentCustomer) {
           const updatedCust = {
             ...currentCustomer,

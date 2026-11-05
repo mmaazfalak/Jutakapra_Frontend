@@ -321,7 +321,6 @@ export const UnifiedStorage = {
               avatar_url: updatedUser.avatarUrl || '',
               role: updatedUser.role || 'customer',
               status: updatedUser.status || 'active',
-              address: defaultAddr?.address || '',
               default_shipping_address: defaultAddr?.address || '',
               city: defaultAddr?.city || '',
               state: defaultAddr?.state || '',
