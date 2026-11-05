@@ -9,7 +9,6 @@ import { CommandKModal } from './components/CommandKModal';
 import { FloatingCartButton } from './components/FloatingCartButton';
 import { MobileAppNavBar } from './components/MobileAppNavBar';
 import { CheckoutGateModal } from './components/CheckoutGateModal';
-import { GoogleSetupPasswordModal } from './components/GoogleSetupPasswordModal';
 
 // HomeView is loaded eagerly for instant above-the-fold First Contentful Paint
 import { HomeView } from './views/HomeView';
@@ -125,7 +124,6 @@ const MainApp: React.FC = () => {
       <CartDrawer />
       <QuickViewModal />
       <CheckoutGateModal />
-      <GoogleSetupPasswordModal />
       <CommandKModal />
       <FloatingCartButton />
       <MobileAppNavBar />

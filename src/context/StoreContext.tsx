@@ -1630,18 +1630,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     );
     const hasDismissedPrompt = typeof window !== 'undefined' && localStorage.getItem('dismissed_pwd_modal_' + user.email.toLowerCase()) === 'true';
 
-    if (!hasExistingPassword && !hasDismissedPrompt && isNewAccount) {
-      setIsGoogleSetupPasswordModalOpen(true);
-    } else {
-      setIsGoogleSetupPasswordModalOpen(false);
-    }
-
-    addToast({
-      type: 'success',
-      title: 'Google Sign-In Successful',
-      message: `Signed in as ${user.email} (${user.fullName})`,
-      duration: 3500,
-    });
+    setIsGoogleSetupPasswordModalOpen(false);
 
     return user;
   };
