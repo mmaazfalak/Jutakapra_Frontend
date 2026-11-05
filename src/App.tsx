@@ -1,13 +1,16 @@
 import React, { useEffect, Suspense, lazy } from 'react';
 import { StoreProvider, useStore } from './context/StoreContext';
+// Lightweight UI elements loaded eagerly
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
-import { CartDrawer } from './components/CartDrawer';
-import { QuickViewModal } from './components/QuickViewModal';
-import { CommandKModal } from './components/CommandKModal';
 import { FloatingCartButton } from './components/FloatingCartButton';
 import { MobileAppNavBar } from './components/MobileAppNavBar';
-import { CheckoutGateModal } from './components/CheckoutGateModal';
+
+// Heavy interactive overlay modals split into on-demand chunks for fast initial paint
+const CartDrawer = lazyWithRetry(() => import('./components/CartDrawer').then((m) => ({ default: m.CartDrawer })));
+const QuickViewModal = lazyWithRetry(() => import('./components/QuickViewModal').then((m) => ({ default: m.QuickViewModal })));
+const CommandKModal = lazyWithRetry(() => import('./components/CommandKModal').then((m) => ({ default: m.CommandKModal })));
+const CheckoutGateModal = lazyWithRetry(() => import('./components/CheckoutGateModal').then((m) => ({ default: m.CheckoutGateModal })));
 
 // HomeView is loaded eagerly for instant above-the-fold First Contentful Paint
 import { HomeView } from './views/HomeView';
@@ -67,7 +70,7 @@ const ViewSkeleton: React.FC = () => (
 );
 
 const MainApp: React.FC = () => {
-  const { currentView } = useStore();
+  const { currentView, isCartOpen, quickViewProduct, isCommandKOpen, isCheckoutGateOpen } = useStore();
 
   // Scroll to top on view change
   useEffect(() => {
@@ -147,10 +150,12 @@ const MainApp: React.FC = () => {
         <Suspense fallback={<ViewSkeleton />}>{renderView()}</Suspense>
       </main>
       <Footer />
-      <CartDrawer />
-      <QuickViewModal />
-      <CheckoutGateModal />
-      <CommandKModal />
+      <Suspense fallback={null}>
+        {isCartOpen && <CartDrawer />}
+        {quickViewProduct && <QuickViewModal />}
+        {isCheckoutGateOpen && <CheckoutGateModal />}
+        {isCommandKOpen && <CommandKModal />}
+      </Suspense>
       <FloatingCartButton />
       <MobileAppNavBar />
     </div>

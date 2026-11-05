@@ -143,6 +143,10 @@ export const HomeView: React.FC = () => {
                 src={bento.image}
                 alt={bento.title}
                 referrerPolicy="no-referrer"
+                loading="lazy"
+                decoding="async"
+                width={800}
+                height={400}
                 className="w-full h-full object-cover opacity-70 group-hover:opacity-60 transition-all duration-500 group-hover:scale-105"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/40 to-transparent" />
