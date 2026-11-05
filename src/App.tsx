@@ -4,7 +4,6 @@ import { Header } from './components/Header';
 import { Footer } from './components/Footer';
 import { CartDrawer } from './components/CartDrawer';
 import { QuickViewModal } from './components/QuickViewModal';
-import { ToastContainer } from './components/ToastContainer';
 import { CommandKModal } from './components/CommandKModal';
 import { FloatingCartButton } from './components/FloatingCartButton';
 import { MobileAppNavBar } from './components/MobileAppNavBar';
@@ -152,7 +151,6 @@ const MainApp: React.FC = () => {
       <CommandKModal />
       <FloatingCartButton />
       <MobileAppNavBar />
-      <ToastContainer />
     </div>
   );
 };
