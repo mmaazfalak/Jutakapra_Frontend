@@ -2695,6 +2695,14 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
     clearCart();
 
+    if (data.customer?.email) {
+      safeFetchJson('/api/cart/clear', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: data.customer.email }),
+      }).catch(() => {});
+    }
+
     addAuditLog({
       provider: 'STORE_CHECKOUT',
       action: 'ORDER_CREATED',
@@ -3549,6 +3557,26 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   );
   const freeShippingThreshold = 5000;
   const freeShippingRemaining = Math.max(0, freeShippingThreshold - cartSubtotal);
+
+  // Sync active cart session with backend for 1-24h abandoned cart recovery
+  useEffect(() => {
+    const email = currentCustomer?.email;
+    if (email && cart.length > 0) {
+      const timer = setTimeout(() => {
+        safeFetchJson('/api/cart/sync', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email,
+            customerName: currentCustomer?.fullName,
+            items: cart,
+            total: cartSubtotal,
+          }),
+        }).catch(() => {});
+      }, 2500);
+      return () => clearTimeout(timer);
+    }
+  }, [cart, currentCustomer?.email, cartSubtotal]);
 
   // Super Admin Auth (Authenticates against database & Supabase Auth)
   const loginAdmin = async (password: string, email?: string, is2faVerified?: boolean): Promise<boolean> => {
