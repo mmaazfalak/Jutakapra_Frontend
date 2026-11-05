@@ -1068,7 +1068,14 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           credentials: 'include',
         });
         if (res.ok && res.data?.success && res.data.user) {
-          const userObj = formatUserDataToCustomer(res.data.user);
+          if (res.data?.token) {
+        try {
+          localStorage.setItem('juta_token', res.data.token);
+          localStorage.setItem('token', res.data.token);
+        } catch {}
+      }
+
+      const userObj = formatUserDataToCustomer(res.data.user);
           setCurrentCustomer((prev) => {
             if (!prev) return userObj;
             return {
@@ -1894,6 +1901,13 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         }).then();
       }
 
+      if (res.data?.token) {
+        try {
+          localStorage.setItem('juta_token', res.data.token);
+          localStorage.setItem('token', res.data.token);
+        } catch {}
+      }
+
       const userObj = formatUserDataToCustomer(res.data.user);
 
       setCustomers((prev) => [userObj, ...prev.filter((c) => c.email.toLowerCase() !== userObj.email.toLowerCase())]);
@@ -1938,6 +1952,13 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           email: email.trim().toLowerCase(),
           password,
         }).then();
+      }
+
+      if (res.data?.token) {
+        try {
+          localStorage.setItem('juta_token', res.data.token);
+          localStorage.setItem('token', res.data.token);
+        } catch {}
       }
 
       const userObj = formatUserDataToCustomer(res.data.user);

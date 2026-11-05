@@ -126,6 +126,12 @@ export const verifyGoogleCredentialWithBackend = async (
     });
 
     if (res.ok && res.data?.success && res.data.user) {
+      if (res.data?.token) {
+        try {
+          localStorage.setItem('juta_token', res.data.token);
+          localStorage.setItem('token', res.data.token);
+        } catch {}
+      }
       return {
         success: true,
         user: res.data.user,

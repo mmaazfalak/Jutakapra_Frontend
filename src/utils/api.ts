@@ -40,6 +40,16 @@ export async function safeFetchJson<T = any>(
       headers.set('Accept', 'application/json');
     }
 
+    try {
+      const storedToken =
+        localStorage.getItem('juta_token') ||
+        localStorage.getItem('forge_token') ||
+        localStorage.getItem('token');
+      if (storedToken && !headers.has('Authorization')) {
+        headers.set('Authorization', `Bearer ${storedToken}`);
+      }
+    } catch {}
+
     const targetUrl = getApiUrl(url);
     const response = await fetch(targetUrl, {
       ...options,
