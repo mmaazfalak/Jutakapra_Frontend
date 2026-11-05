@@ -4,10 +4,10 @@ import { ShoppingBag } from 'lucide-react';
 import { useStore } from '../context/StoreContext';
 
 export const FloatingCartButton: React.FC = () => {
-  const { cartCount, setIsCartOpen, isCartOpen } = useStore();
+  const { cartCount, navigateTo, currentView } = useStore();
 
-  // If cart drawer is already open, hide floating button to avoid overlap
-  if (isCartOpen) return null;
+  // If already on the dedicated cart page, hide floating button to avoid overlap
+  if (currentView === 'cart') return null;
 
   return (
     <div className="hidden md:block fixed bottom-6 right-6 z-40 sm:bottom-8 sm:right-8">
@@ -18,7 +18,7 @@ export const FloatingCartButton: React.FC = () => {
         exit={{ scale: 0, opacity: 0 }}
         whileHover={{ scale: 1.08 }}
         whileTap={{ scale: 0.92 }}
-        onClick={() => setIsCartOpen(true)}
+        onClick={() => navigateTo('cart')}
         className="relative group flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-[#0a0a0a] text-white shadow-2xl border-2 border-white/20 hover:border-[#e5341f] hover:bg-[#e5341f] transition-colors duration-200 cursor-pointer focus:outline-none focus:ring-4 focus:ring-[#e5341f]/30"
         aria-label={`Open shopping bag with ${cartCount} items`}
         title={`Shopping Bag (${cartCount} ${cartCount === 1 ? 'item' : 'items'})`}

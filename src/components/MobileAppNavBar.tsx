@@ -16,6 +16,7 @@ export const MobileAppNavBar: React.FC = () => {
   const isHomeActive = currentView === 'home';
   const isShopActive = currentView === 'shop' || currentView === 'product';
   const isDropsActive = currentView === 'drops';
+  const isCartActive = currentView === 'cart';
   const isAccountActive = [
     'account',
     'account-profile',
@@ -106,19 +107,29 @@ export const MobileAppNavBar: React.FC = () => {
         {/* 4. SHOPPING BAG TAB */}
         <motion.button
           whileTap={{ scale: 0.88 }}
-          onClick={() => setIsCartOpen(true)}
-          className="flex flex-col items-center justify-center flex-1 py-1 px-1.5 rounded-2xl transition-all duration-200 relative text-zinc-400 hover:text-zinc-200"
+          onClick={() => navigateTo('cart')}
+          className={`flex flex-col items-center justify-center flex-1 py-1 px-1.5 rounded-2xl transition-all duration-200 relative ${
+            isCartActive ? 'text-white' : 'text-zinc-400 hover:text-zinc-200'
+          }`}
           aria-label={`Shopping Bag (${cartCount} items)`}
         >
+          {isCartActive && (
+            <motion.span
+              layoutId="mobileNavActiveIndicator"
+              className="absolute -top-1.5 w-6 h-1 bg-[#e5341f] rounded-full shadow-[0_0_10px_rgba(229,52,31,0.9)]"
+            />
+          )}
           <div className="relative">
-            <ShoppingBag className="w-5 h-5 stroke-2" />
+            <ShoppingBag className={`w-5 h-5 ${isCartActive ? 'stroke-[2.5px] text-[#e5341f]' : 'stroke-2'}`} />
             {cartCount > 0 && (
               <span className="absolute -top-1.5 -right-2.5 bg-[#e5341f] text-white text-[9px] font-black rounded-full h-4 min-w-[16px] px-1 flex items-center justify-center shadow-lg border border-black animate-pulse">
                 {cartCount}
               </span>
             )}
           </div>
-          <span className="text-[10px] font-semibold tracking-tight mt-0.5">Bag</span>
+          <span className={`text-[10px] tracking-tight mt-0.5 ${isCartActive ? 'font-black text-white' : 'font-semibold'}`}>
+            Bag
+          </span>
         </motion.button>
 
         {/* 5. USER ACCOUNT TAB */}

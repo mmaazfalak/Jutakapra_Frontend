@@ -336,6 +336,30 @@ export const Header: React.FC = () => {
               )}
             </button>
 
+            {/* Desktop Shopping Bag Header Button */}
+            <button
+              onClick={() => navigateTo('cart')}
+              className={`h-9 sm:h-10 px-3 rounded-full border flex items-center space-x-1.5 text-xs font-bold cursor-pointer transition-all shadow-2xs hover:shadow-xs active:scale-95 relative ${
+                currentView === 'cart'
+                  ? 'border-[#e5341f] bg-[#e5341f] text-white'
+                  : isDark
+                  ? 'border-neutral-700 bg-neutral-900 text-white hover:border-neutral-500'
+                  : 'border-[#0a0a0a]/15 hover:border-[#0a0a0a] bg-white text-[#0a0a0a]'
+              }`}
+              aria-label={`Shopping Bag with ${cartCount} items`}
+              title={`Shopping Bag (${cartCount} ${cartCount === 1 ? 'item' : 'items'})`}
+            >
+              <ShoppingBag className="w-3.5 h-3.5" />
+              <span className="hidden lg:inline text-[11px] font-bold">Bag</span>
+              {cartCount > 0 && (
+                <span className={`text-[10px] font-black px-1.5 py-0.2 rounded-full ${
+                  currentView === 'cart' ? 'bg-white text-[#e5341f]' : 'bg-[#e5341f] text-white'
+                }`}>
+                  {cartCount}
+                </span>
+              )}
+            </button>
+
             {/* Logged-In Client Profile Picture Action (Clickable to /account) */}
             {(currentCustomer || profile) ? (
               <button

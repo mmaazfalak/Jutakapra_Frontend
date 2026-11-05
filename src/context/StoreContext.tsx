@@ -140,6 +140,8 @@ interface StoreContextType {
     avatarUrl?: string;
     role?: 'customer' | 'admin';
     status?: 'active' | 'suspended';
+    hasPassword?: boolean;
+    passwordHash?: string;
   }) => Promise<Customer>;
   loginWithGoogleCredential: (credential: string) => Promise<{ success: boolean; customer?: Customer; error?: string }>;
   loginWithEmail: (email: string, password: string, fullName?: string, phone?: string) => { success: boolean; customer?: Customer; error?: string };
@@ -1487,6 +1489,8 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     avatarUrl?: string;
     role?: 'customer' | 'admin';
     status?: 'active' | 'suspended';
+    hasPassword?: boolean;
+    passwordHash?: string;
   }): Promise<Customer> => {
     if (!googleProfile && isSupabaseConfigured()) {
       supabase.auth.signInWithOAuth({
@@ -1630,6 +1634,8 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
     // 5. If user already has a password or already dismissed the prompt, NEVER show the popup
     const hasExistingPassword = Boolean(
+      (googleProfile as any)?.hasPassword ||
+      (googleProfile as any)?.passwordHash ||
       user.hasPassword ||
       user.passwordHash ||
       existing?.hasPassword ||
@@ -1638,6 +1644,18 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       (existingSupabaseUser as any)?.password_hash ||
       (typeof window !== 'undefined' && localStorage.getItem('has_password_' + user.email.toLowerCase()) === 'true')
     );
+
+    if (hasExistingPassword) {
+      user.hasPassword = true;
+      if (!user.passwordHash) {
+        user.passwordHash = (googleProfile as any)?.passwordHash || existing?.passwordHash || 'active';
+      }
+      try {
+        localStorage.setItem('has_password_' + user.email.toLowerCase(), 'true');
+      } catch {}
+      setCurrentCustomer({ ...user });
+      UnifiedStorage.saveUserProfile(user);
+    }
     const hasDismissedPrompt = typeof window !== 'undefined' && localStorage.getItem('dismissed_pwd_modal_' + user.email.toLowerCase()) === 'true';
 
     setIsGoogleSetupPasswordModalOpen(false);
@@ -1729,6 +1747,8 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         avatarUrl: verifiedUser.avatarUrl,
         role: verifiedUser.role,
         status: verifiedUser.status,
+        hasPassword: (verifiedUser as any).hasPassword,
+        passwordHash: (verifiedUser as any).passwordHash,
       });
 
       return { success: true, customer };
@@ -3490,7 +3510,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           title: '1-of-1 Vintage Item',
           message: 'Only 1 available in stock for unique thrift items.',
         });
-        setIsCartOpen(true);
+        navigateTo('cart');
         return false;
       }
       setCart((prev) =>
@@ -3508,7 +3528,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       message: `${product.title} (${selectedSize})`,
     });
 
-    setIsCartOpen(true);
+    navigateTo('cart');
     return true;
   };
 

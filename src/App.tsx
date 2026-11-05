@@ -7,7 +7,6 @@ import { FloatingCartButton } from './components/FloatingCartButton';
 import { MobileAppNavBar } from './components/MobileAppNavBar';
 
 // Heavy interactive overlay modals split into on-demand chunks for fast initial paint
-const CartDrawer = lazyWithRetry(() => import('./components/CartDrawer').then((m) => ({ default: m.CartDrawer })));
 const QuickViewModal = lazyWithRetry(() => import('./components/QuickViewModal').then((m) => ({ default: m.QuickViewModal })));
 const CommandKModal = lazyWithRetry(() => import('./components/CommandKModal').then((m) => ({ default: m.CommandKModal })));
 const CheckoutGateModal = lazyWithRetry(() => import('./components/CheckoutGateModal').then((m) => ({ default: m.CheckoutGateModal })));
@@ -70,7 +69,7 @@ const ViewSkeleton: React.FC = () => (
 );
 
 const MainApp: React.FC = () => {
-  const { currentView, isCartOpen, quickViewProduct, isCommandKOpen, isCheckoutGateOpen } = useStore();
+  const { currentView, quickViewProduct, isCommandKOpen, isCheckoutGateOpen } = useStore();
 
   // Scroll to top on view change
   useEffect(() => {
@@ -151,7 +150,6 @@ const MainApp: React.FC = () => {
       </main>
       <Footer />
       <Suspense fallback={null}>
-        {isCartOpen && <CartDrawer />}
         {quickViewProduct && <QuickViewModal />}
         {isCheckoutGateOpen && <CheckoutGateModal />}
         {isCommandKOpen && <CommandKModal />}

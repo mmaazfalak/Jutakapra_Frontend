@@ -153,6 +153,14 @@ export const AccountView: React.FC = () => {
   const activeAvatar = profile?.avatar_url || currentCustomer?.avatarUrl || '';
   const activeAddresses = currentCustomer?.addresses || [];
 
+  const hasExistingPassword = Boolean(
+    currentCustomer?.hasPassword ||
+    currentCustomer?.passwordHash ||
+    profile?.has_password ||
+    (profile as any)?.password_hash ||
+    (typeof window !== 'undefined' && activeEmail && localStorage.getItem('has_password_' + activeEmail.toLowerCase()) === 'true')
+  );
+
   // Orders filtered for this customer
   const customerOrders = orders.filter(
     (o) =>
@@ -303,6 +311,11 @@ export const AccountView: React.FC = () => {
     setPasswordError('');
     setPasswordSuccess(false);
 
+    if (hasExistingPassword && !currentPassword.trim()) {
+      setPasswordError('Current password is required to update your existing password.');
+      return;
+    }
+
     if (newPassword.length < 6) {
       setPasswordError('New password must be at least 6 characters long.');
       return;
@@ -317,7 +330,7 @@ export const AccountView: React.FC = () => {
       const supaResult = await updateCustomerPassword(newPassword);
 
       const result = await changeCustomerPasswordApi({
-        currentPassword,
+        currentPassword: hasExistingPassword ? currentPassword : '',
         newPassword,
         confirmPassword,
       });
@@ -329,6 +342,15 @@ export const AccountView: React.FC = () => {
         setCurrentPassword('');
         setNewPassword('');
         setConfirmPassword('');
+        if (typeof window !== 'undefined' && activeEmail) {
+          try {
+            localStorage.setItem('has_password_' + activeEmail.toLowerCase(), 'true');
+          } catch {}
+        }
+        if (currentCustomer) {
+          currentCustomer.hasPassword = true;
+          if (!currentCustomer.passwordHash) currentCustomer.passwordHash = 'active';
+        }
         addToast({
           type: 'success',
           title: 'Password Updated',
@@ -971,10 +993,10 @@ export const AccountView: React.FC = () => {
                 {/* Password Form */}
                 <form onSubmit={handleChangePassword} className="space-y-3.5">
                   <h4 className="text-xs font-black text-neutral-950 dark:text-white uppercase tracking-wider">
-                    {currentCustomer.passwordHash || currentCustomer.hasPassword ? 'Change Password' : 'Set Account Password'}
+                    {hasExistingPassword ? 'Update Password' : 'Set Account Password'}
                   </h4>
 
-                  {(currentCustomer.passwordHash && currentCustomer.authProvider !== 'google') && (
+                  {hasExistingPassword && (
                     <div>
                       <label className="block text-[11px] font-bold uppercase tracking-wider text-neutral-800 dark:text-neutral-200 mb-1">
                         Current Password
@@ -984,7 +1006,7 @@ export const AccountView: React.FC = () => {
                           type={showCurrentPw ? 'text' : 'password'}
                           required
                           value={currentPassword}
-                          onChange={(e) => setCurrentPassword(e.target.value)}
+                          onChange={(e) => { setCurrentPassword(e.target.value); setPasswordError(''); }}
                           className="w-full h-8.5 px-3 pr-9 rounded-xl border border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-900 text-xs font-semibold text-neutral-950 dark:text-white focus:outline-none focus:border-neutral-800 dark:focus:border-neutral-300"
                           placeholder="Current password"
                         />
@@ -1002,7 +1024,7 @@ export const AccountView: React.FC = () => {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
                       <label className="block text-[11px] font-bold uppercase tracking-wider text-neutral-800 dark:text-neutral-200 mb-1">
-                        {currentCustomer.passwordHash || currentCustomer.hasPassword ? 'New Password' : 'Create Password'}
+                        {hasExistingPassword ? 'New Password' : 'Create Password'}
                       </label>
                       <div className="relative">
                         <input
@@ -1052,7 +1074,7 @@ export const AccountView: React.FC = () => {
                       disabled={isChangingPw}
                       className="h-8.5 px-5 rounded-xl bg-neutral-950 hover:bg-neutral-800 dark:bg-white dark:hover:bg-neutral-200 text-white dark:text-black text-xs font-bold transition-colors cursor-pointer disabled:opacity-50 shadow-2xs"
                     >
-                      {isChangingPw ? 'Saving...' : 'Update Password'}
+                      {isChangingPw ? 'Saving...' : hasExistingPassword ? 'Update Password' : 'Set Account Password'}
                     </button>
                   </div>
                 </form>
