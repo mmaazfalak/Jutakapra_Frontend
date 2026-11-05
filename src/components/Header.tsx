@@ -137,9 +137,9 @@ export const Header: React.FC = () => {
             aria-label="Juta Kapra Home"
           >
             <img
-              src="https://i.postimg.cc/W1hRXfMh/Screenshot-2026-09-19-at-12-25-17-AM.png"
+              src={isDark ? "/logo-white.png" : "/logo.png"}
               alt="Juta.Kapra Logo"
-              className="w-8 h-8 rounded-lg object-contain shadow-xs border border-black/5"
+              className="w-8 h-8 object-contain transition-transform"
             />
             <div className="flex flex-col">
               <span className={`text-[17px] font-black tracking-tight leading-none ${isDark ? 'text-white' : 'text-[#0a0a0a]'}`}>
@@ -264,9 +264,9 @@ export const Header: React.FC = () => {
               aria-label="Juta Kapra Home"
             >
               <img
-                src="https://i.postimg.cc/W1hRXfMh/Screenshot-2026-09-19-at-12-25-17-AM.png"
+                src={isDark ? "/logo-white.png" : "/logo.png"}
                 alt="Juta.Kapra Logo"
-                className="w-8.5 h-8.5 sm:w-9 sm:h-9 rounded-lg object-contain transition-transform group-hover:scale-105"
+                className="w-8.5 h-8.5 sm:w-9 sm:h-9 object-contain transition-transform group-hover:scale-105"
               />
               <div className="flex flex-col">
                 <span className={`text-xl sm:text-2xl font-black tracking-[-0.04em] leading-none whitespace-nowrap ${isDark ? 'text-white' : 'text-[#0a0a0a]'}`}>
@@ -567,9 +567,9 @@ export const Header: React.FC = () => {
                 }`}>
                   <div className="flex items-center space-x-2.5">
                     <img
-                      src="https://i.postimg.cc/W1hRXfMh/Screenshot-2026-09-19-at-12-25-17-AM.png"
+                      src={isDark ? "/logo-white.png" : "/logo.png"}
                       alt="Juta.Kapra Logo"
-                      className="w-7 h-7 rounded-md object-contain"
+                      className="w-7 h-7 object-contain"
                     />
                     <span className={`font-black text-base ${isDark ? 'text-white' : 'text-[#0a0a0a]'}`}>Juta.Kapra</span>
                   </div>

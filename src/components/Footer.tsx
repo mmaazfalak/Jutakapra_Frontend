@@ -58,9 +58,9 @@ export const Footer: React.FC = () => {
         <div className="md:col-span-2 space-y-4">
           <div className="flex items-center space-x-2.5">
             <img
-              src="https://i.postimg.cc/W1hRXfMh/Screenshot-2026-09-19-at-12-25-17-AM.png"
+              src="/logo-white.png"
               alt="Juta.Kapra Logo"
-              className="w-8 h-8 rounded-lg object-contain bg-white p-0.5"
+              className="w-8 h-8 object-contain"
             />
             <span className="text-xl font-black tracking-tight">
               Juta<span className="text-[#e5341f]">.</span>Kapra
