@@ -51,10 +51,27 @@ export async function safeFetchJson<T = any>(
     } catch {}
 
     const targetUrl = getApiUrl(url);
-    const response = await fetch(targetUrl, {
-      ...options,
-      headers,
-    });
+    let response: Response;
+    try {
+      response = await fetch(targetUrl, {
+        ...options,
+        headers,
+      });
+
+      // If direct backend returned non-ok and targetUrl is different from relative url, try relative proxy
+      if (!response.ok && targetUrl !== url && url.startsWith('/api')) {
+        const fallbackRes = await fetch(url, { ...options, headers }).catch(() => null);
+        if (fallbackRes && fallbackRes.ok) {
+          response = fallbackRes;
+        }
+      }
+    } catch (netErr) {
+      if (targetUrl !== url && url.startsWith('/api')) {
+        response = await fetch(url, { ...options, headers });
+      } else {
+        throw netErr;
+      }
+    }
 
     const contentType = response.headers.get('content-type') || '';
     const isJson = contentType.includes('application/json');
