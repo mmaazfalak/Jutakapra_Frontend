@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   ShieldCheck,
   CreditCard,
@@ -68,6 +68,7 @@ export const CheckoutView: React.FC = () => {
   const [completedOrder, setCompletedOrder] = useState<Order | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [validationError, setValidationError] = useState<string | null>(null);
+  const submissionLockRef = useRef<boolean>(false);
 
   // Synchronize form inputs with rehydrated profile & currentCustomer
   useEffect(() => {
@@ -175,17 +176,26 @@ export const CheckoutView: React.FC = () => {
   const handleSubmitOrder = (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Double-submission lock / debounce to prevent dual email triggers and repeat orders
+    if (submissionLockRef.current || isSubmitting) {
+      return;
+    }
+    submissionLockRef.current = true;
+
     if (!currentCustomer && !profile) {
+      submissionLockRef.current = false;
       setIsCheckoutGateOpen(true);
       return;
     }
 
     if (!formData.phone.trim()) {
+      submissionLockRef.current = false;
       setValidationError('Please provide a mandatory phone number for SMS/WhatsApp delivery updates.');
       return;
     }
 
     if (!formData.address.trim() || !formData.city.trim()) {
+      submissionLockRef.current = false;
       setValidationError('Please select or add a complete delivery shipping address.');
       return;
     }
@@ -205,18 +215,21 @@ export const CheckoutView: React.FC = () => {
     );
 
     setTimeout(() => {
-      const newOrder = createOrder({
-        customer: { ...formData },
-        items: [...cart],
-        subtotal: cartSubtotal,
-        shipping: shippingFee,
-        discount: 0,
-        total: orderTotal,
-        paymentMethod: selectedGateway.type || selectedGateway.id,
-        status: 'Processing',
-      });
-      setCompletedOrder(newOrder);
-      setIsSubmitting(false);
+      try {
+        const newOrder = createOrder({
+          customer: { ...formData },
+          items: [...cart],
+          subtotal: cartSubtotal,
+          shipping: shippingFee,
+          discount: 0,
+          total: orderTotal,
+          paymentMethod: selectedGateway.type || selectedGateway.id,
+          status: 'Processing',
+        });
+        setCompletedOrder(newOrder);
+      } finally {
+        setIsSubmitting(false);
+      }
     }, 800);
   };
 

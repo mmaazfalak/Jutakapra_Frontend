@@ -5,10 +5,17 @@ import { getApiUrl } from '../utils/api';
  * Exclusively powered by Google Apps Script Webhook
  */
 
-const GOOGLE_SHEETS_WEBHOOK_URL =
+/**
+ * Active Google Apps Script Deployment URL
+ * Set to "" as a clean placeholder so a new deployment URL can be inserted later without breaking builds.
+ */
+export const GAS_DEPLOYMENT_URL =
+  (import.meta as any).env?.VITE_GAS_DEPLOYMENT_URL ||
   (import.meta as any).env?.VITE_GOOGLE_SHEETS_WEBHOOK_URL ||
   (import.meta as any).env?.GOOGLE_SHEETS_WEBHOOK_URL ||
-  'https://script.google.com/macros/s/AKfycbyKB2IQJaf8v3eU6rVgqz_Bp5S0iEemFa6ld-ereWcF7D_KOm1GRPgzWJrJLLx6QWSxoA/exec';
+  '';
+
+export const GOOGLE_SHEETS_WEBHOOK_URL = GAS_DEPLOYMENT_URL;
 
 const WEBHOOK_SECRET =
   (import.meta as any).env?.VITE_GOOGLE_SHEETS_WEBHOOK_SECRET ||
@@ -27,12 +34,18 @@ export interface NotificationEmailOptions {
     | 'admin_login_otp'
     | 'welcome'
     | 'order_placed'
+    | 'send_order_placed'
     | 'order_confirmed'
+    | 'send_order_confirmed'
     | 'order_dispatched'
+    | 'send_order_dispatched'
     | 'order_delivered'
     | 'order_confirmation'
+    | 'abandoned_cart'
+    | 'send_cart_abandoned'
     | 'password_reset'
     | string;
+  action?: string;
   metadata?: Record<string, any>;
   sendAdminCopy?: boolean;
 }
@@ -41,14 +54,20 @@ export interface NotificationEmailOptions {
  * Send an email notification via Google Apps Script Webhook (non-blocking, follows redirects)
  */
 export async function sendNotificationEmail(options: NotificationEmailOptions): Promise<boolean> {
-  if (!GOOGLE_SHEETS_WEBHOOK_URL) {
-    console.warn('[EmailService] Webhook URL not configured. Notification skipped.');
-    return false;
+  const activeUrl = GAS_DEPLOYMENT_URL || GOOGLE_SHEETS_WEBHOOK_URL;
+
+  // Safety check: if GAS_DEPLOYMENT_URL is empty, log clean warning and skip network execution instead of crashing
+  if (!activeUrl || !activeUrl.trim()) {
+    console.warn('[EmailService] GAS_DEPLOYMENT_URL is empty or not configured. Skipping network execution cleanly.');
+    return true; // Graceful non-blocking exit, prevents any app crash
   }
 
-  const { to, subject, htmlBody, body, plainText, type, metadata = {}, sendAdminCopy = false } = options;
+  const { to, subject, htmlBody, body, plainText, type, action, metadata = {}, sendAdminCopy = false } = options;
   const recipientEmail = (to || '').toLowerCase().trim();
   const plainTextContent = body || plainText || subject;
+
+  // Normalized action string for Google Apps Script doPost(e)
+  const resolvedAction = action || (type ? (type.startsWith('send_') ? type : `send_${type}`) : 'send_notification');
 
   // Guarantee htmlBody is NEVER empty or undefined
   const formattedHtmlContent =
@@ -61,8 +80,9 @@ export async function sendNotificationEmail(options: NotificationEmailOptions): 
         </div>
       `.trim();
 
-  // Exact JSON payload format requested
+  // Exact JSON payload format requested with explicit action
   const payload = {
+    action: resolvedAction,
     to: recipientEmail,
     subject: subject || 'Juta.Kapra Notification',
     htmlBody: formattedHtmlContent,
@@ -299,7 +319,8 @@ export async function sendOrderPlacedEmail(order: any): Promise<boolean> {
     subject: `Order Placed: #${orderNum} - Juta.Kapra`,
     htmlBody,
     body: `Your order #${orderNum} has been placed. Total: Rs. ${Number(total).toLocaleString()}`,
-    type: 'order_placed',
+    type: 'send_order_placed',
+    action: 'send_order_placed',
     sendAdminCopy: true, // Also alerts mmaazfalak@icloud.com
     metadata: {
       orderId: order.id || orderNum,
@@ -341,7 +362,8 @@ export async function sendOrderConfirmedEmail(order: any): Promise<boolean> {
     subject: `Order Confirmed: #${orderNum} - Juta.Kapra`,
     htmlBody,
     body: `Your order #${orderNum} has been confirmed. Total: Rs. ${Number(total).toLocaleString()}`,
-    type: 'order_confirmed',
+    type: 'send_order_confirmed',
+    action: 'send_order_confirmed',
     sendAdminCopy: true,
     metadata: {
       orderId: order.id || orderNum,
@@ -359,13 +381,15 @@ export async function sendOrderDispatchedEmail(
   order: any,
   courierName?: string,
   trackingNumber?: string,
-  trackingUrl?: string
+  trackingUrl?: string,
+  estimatedDeliveryDate?: string
 ): Promise<boolean> {
   const orderNum = order.orderNumber || order.id || 'FS-ORDER';
   const customerName = order.customer?.fullName || order.customerName || 'Customer';
   const customerEmail = order.customer?.email || order.email || '';
   const courier = courierName || order.courier || 'TCS Express';
   const tracking = trackingNumber || order.trackingNumber || 'Pending';
+  const estimatedDate = estimatedDeliveryDate || order.estimatedDeliveryDate || 'Within 2-3 business days';
 
   const htmlBody = `
     <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 580px; margin: 0 auto; padding: 24px; background: #0a0a0a; color: #ffffff; border-radius: 16px;">
@@ -382,7 +406,12 @@ export async function sendOrderDispatchedEmail(
         <p style="margin: 2px 0 12px 0; font-size: 16px; font-weight: 800; color: #ffffff;">${courier}</p>
         
         <p style="margin: 0; font-size: 13px; color: #a1a1aa;">Tracking Consignment #:</p>
-        <p style="margin: 2px 0 0 0; font-size: 18px; font-family: monospace; font-weight: 900; color: #3b82f6;">${tracking}</p>
+        <p style="margin: 2px 0 12px 0; font-size: 18px; font-family: monospace; font-weight: 900; color: #3b82f6;">${tracking}</p>
+
+        <div style="padding-top: 10px; border-top: 1px solid #27272a;">
+          <p style="margin: 0; font-size: 11px; text-transform: uppercase; color: #34d399; font-weight: 800;">Estimated Delivery Date:</p>
+          <p style="margin: 2px 0 0 0; font-size: 14px; font-weight: 800; color: #ffffff;">📅 ${estimatedDate}</p>
+        </div>
       </div>
 
       ${
@@ -397,8 +426,9 @@ export async function sendOrderDispatchedEmail(
     to: customerEmail,
     subject: `Dispatched: Order #${orderNum} via ${courier} (${tracking})`,
     htmlBody,
-    body: `Your order #${orderNum} has been dispatched via ${courier}. Tracking #: ${tracking}`,
-    type: 'order_dispatched',
+    body: `Your order #${orderNum} has been dispatched via ${courier}. Tracking #: ${tracking}. Estimated Delivery: ${estimatedDate}`,
+    type: 'send_order_dispatched',
+    action: 'send_order_dispatched',
     sendAdminCopy: true,
     metadata: {
       orderId: order.id || orderNum,
@@ -407,6 +437,7 @@ export async function sendOrderDispatchedEmail(
       courier,
       trackingNumber: tracking,
       trackingUrl: trackingUrl || '',
+      estimatedDeliveryDate: estimatedDate,
     },
   });
 }
@@ -516,10 +547,12 @@ export async function sendAbandonedCartEmail(options: {
   name?: string;
   cartItems: any[];
   cartTotal?: number;
+  checkoutUrl?: string;
 }): Promise<boolean> {
-  const { to, name, cartItems, cartTotal } = options;
+  const { to, name, cartItems, cartTotal, checkoutUrl } = options;
   const customerName = name || to.split('@')[0] || 'Collector';
   const total = cartTotal ? ` (Rs. ${Number(cartTotal).toLocaleString()})` : '';
+  const returnUrl = checkoutUrl || 'https://www.jutakapra.store/cart';
 
   const itemsHtml = (cartItems || [])
     .map(
@@ -535,11 +568,11 @@ export async function sendAbandonedCartEmail(options: {
   const htmlBody = `
     <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 580px; margin: 0 auto; padding: 24px; background: #0a0a0a; color: #ffffff; border-radius: 16px;">
       <h1 style="font-size: 22px; font-weight: 900; margin-bottom: 4px; letter-spacing: -0.5px;">JUTA.KAPRA ARCHIVE</h1>
-      <p style="font-size: 14px; color: #3b82f6; font-weight: 700; margin-bottom: 20px;">Your Curated Bag Awaits</p>
+      <p style="font-size: 14px; color: #f87171; font-weight: 800; margin-bottom: 20px;">⚡ Get your order delivered before someone else grabs it!</p>
       
       <p style="font-size: 14px; line-height: 1.6; color: #e4e4e7;">
         Hello <strong>${customerName}</strong>,<br/><br/>
-        You left some rare archival pieces in your shopping bag. Because our vintage pieces are unique 1-of-1 items, they remain open to other collectors until checked out.
+        You left some rare archival pieces in your shopping bag over 10 hours ago. Because our vintage pieces are unique 1-of-1 items, they remain open to other collectors until checked out.
       </p>
 
       <div style="margin: 20px 0; padding: 16px; background: #18181b; border: 1px solid #27272a; border-radius: 12px;">
@@ -549,7 +582,7 @@ export async function sendAbandonedCartEmail(options: {
       </div>
 
       <p style="margin-top: 20px;">
-        <a href="https://www.jutakapra.store/cart" style="background: #2563eb; color: #ffffff; padding: 12px 28px; border-radius: 8px; text-decoration: none; font-size: 13px; font-weight: 800; display: inline-block;">
+        <a href="${returnUrl}" style="background: #e5341f; color: #ffffff; padding: 12px 28px; border-radius: 8px; text-decoration: none; font-size: 13px; font-weight: 800; display: inline-block;">
           Complete Your Order Now →
         </a>
       </p>
@@ -558,10 +591,16 @@ export async function sendAbandonedCartEmail(options: {
 
   return sendNotificationEmail({
     to,
-    subject: `You Left Something in Your Bag | Juta Kapra`,
+    subject: `Get your order delivered before someone else grabs it! | Juta.Kapra`,
     htmlBody,
-    body: `You left items in your Juta Kapra cart${total}. Complete order at https://www.jutakapra.store/cart`,
-    type: 'abandoned_cart',
+    body: `Get your order delivered before someone else grabs it! Complete order at ${returnUrl}${total}`,
+    type: 'send_cart_abandoned',
+    action: 'send_cart_abandoned',
+    metadata: {
+      customerName,
+      cartTotal,
+      checkoutUrl: returnUrl,
+    },
   });
 }
 

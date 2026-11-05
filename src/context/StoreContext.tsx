@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import {
   Product,
   CartItem,
@@ -115,7 +115,8 @@ interface StoreContextType {
     courierName: string,
     trackingNumber: string,
     trackingUrl: string,
-    dispatchNote?: string
+    dispatchNote?: string,
+    estimatedDeliveryDate?: string
   ) => void;
   completeOrderDelivery: (orderId: string) => void;
 
@@ -435,6 +436,8 @@ const parseRouteFromLocation = (isAdminAuth: boolean): { view: string; param: st
 };
 
 export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const sentOrderEmailIds = useRef<Set<string>>(new Set());
+
   // Admin Auth initial check
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState<boolean>(() => {
     try {
@@ -2733,10 +2736,11 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     });
 
     // Save across all database tiers immediately (Website DB, Supabase, Cache)
+    // Pass skipEmailNotification: true to prevent backend duplicate email trigger
     safeFetchJson('/api/orders', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(newOrder),
+      body: JSON.stringify({ ...newOrder, skipEmailNotification: true }),
     }).then((res) => {
       if (!res.ok) {
         console.warn('[StoreContext] Central /api/orders persistence returned error:', res.error);
@@ -2749,10 +2753,13 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       console.warn('[StoreContext] UnifiedStorage saveOrder warning:', err)
     );
 
-    // Direct Non-Blocking Google Apps Script Webhook Trigger ("order_placed" + admin alert copy)
-    sendOrderPlacedEmail(newOrder).catch((err) =>
-      console.error('[StoreContext] Order placed email error:', err.message)
-    );
+    // Direct Non-Blocking Google Apps Script Webhook Trigger ("order_placed" + admin alert copy) with deduplication lock
+    if (!sentOrderEmailIds.current.has(newOrder.id)) {
+      sentOrderEmailIds.current.add(newOrder.id);
+      sendOrderPlacedEmail(newOrder).catch((err) =>
+        console.error('[StoreContext] Order placed email error:', err.message)
+      );
+    }
 
     return newOrder;
   };
@@ -2815,7 +2822,8 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     courierName: string,
     trackingNumber: string,
     trackingUrl: string,
-    dispatchNote?: string
+    dispatchNote?: string,
+    estimatedDeliveryDate?: string
   ) => {
     const dispatchedAt = new Date().toISOString();
     const trackingObj: CourierTracking = {
@@ -2824,6 +2832,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       trackingUrl,
       dispatchedAt,
       dispatchNote,
+      estimatedDeliveryDate,
     };
 
     let targetOrder: Order | undefined;
@@ -2836,6 +2845,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             status: 'Dispatched to Courier',
             courier: courierName,
             trackingNumber,
+            estimatedDeliveryDate: estimatedDeliveryDate || o.estimatedDeliveryDate,
             courierTracking: trackingObj,
           };
           return targetOrder;
@@ -2849,7 +2859,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       action: 'ORDER_DISPATCHED',
       transactionId: orderId,
       httpStatusCode: 200,
-      payload: JSON.stringify({ courierName, trackingNumber, trackingUrl, dispatchNote }, null, 2),
+      payload: JSON.stringify({ courierName, trackingNumber, trackingUrl, dispatchNote, estimatedDeliveryDate }, null, 2),
       adminUser: 'super_admin_maaz',
     });
 
@@ -2869,6 +2879,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         trackingNumber,
         trackingUrl,
         dispatchNote,
+        estimatedDeliveryDate,
       }),
     }).catch((err) => console.error('Sheet order dispatch error:', err.message));
 
@@ -2884,7 +2895,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
     const orderRef = targetOrder || orders.find((o) => o.id === orderId || o.orderNumber === orderId);
     if (orderRef) {
-      sendOrderDispatchedEmail(orderRef, courierName, trackingNumber, trackingUrl).catch((err) =>
+      sendOrderDispatchedEmail(orderRef, courierName, trackingNumber, trackingUrl, estimatedDeliveryDate).catch((err) =>
         console.error('[StoreContext] Dispatch email error:', err.message)
       );
     }
