@@ -387,7 +387,9 @@ const getPathFromView = (view: string, param?: string | null): string => {
     case 'account':
       return '/account';
     case 'account-orders':
-      return '/account/orders';
+    case 'orders':
+    case 'track':
+      return '/track';
     case 'condition-guide':
       return '/condition-guide';
     case 'drops':
@@ -422,7 +424,7 @@ const parseRouteFromLocation = (isAdminAuth: boolean): { view: string; param: st
   }
   if (normalized === '/cart') return { view: 'cart', param: null };
   if (normalized === '/checkout') return { view: 'checkout', param: null };
-  if (normalized === '/account/orders') return { view: 'account-orders', param: null };
+  if (normalized === '/account/orders' || normalized === '/track' || normalized === '/orders') return { view: 'account-orders', param: null };
   if (normalized === '/account') return { view: 'account', param: null };
   if (normalized === '/condition-guide') return { view: 'condition-guide', param: null };
   if (normalized === '/drops') return { view: 'drops', param: null };

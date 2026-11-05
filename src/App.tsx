@@ -116,6 +116,8 @@ const MainApp: React.FC = () => {
       case 'contact':
         return <ContactView />;
       case 'orders':
+      case 'account-orders':
+      case 'track':
         return <CustomerOrdersView />;
       case 'account':
         return <AccountView />;
