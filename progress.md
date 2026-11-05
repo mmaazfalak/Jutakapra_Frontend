@@ -17,7 +17,8 @@
 | **User Registration & Forms** | 1 | 1 | 0 | 0 |
 | **Cart / Bag Dedicated Page** | 1 | 1 | 0 | 0 |
 | **Auth & Password Security** | 1 | 1 | 0 | 0 |
-| **Total** | **4** | **4 (100%)** | **0 (0%)** | **0** |
+| **Email Lifecycle & Admin Overhaul** | 1 | 1 | 0 | 0 |
+| **Total** | **5** | **5 (100%)** | **0 (0%)** | **0** |
 
 ---
 
@@ -86,8 +87,33 @@
 
 ---
 
+### Milestone 5: Complete Email Lifecycle, Backend & Admin Panel Overhaul
+- **Goal**: Production-ready email dispatcher in Google Apps Script, duplicate email suppression, empty deployment URL safety, admin delivery date dispatch, and 10-hour abandoned cart recovery.
+- **Status**: 100% Completed & Deployed
+- **Commits**: `fa2018a` (Frontend), `c779157` (Backend)
+- **Subtask Checklist**:
+  - [x] **Google Apps Script Backend** ([`gas/Code.gs`](file:///Users/mmaazfalak/antigravity/gas/Code.gs)):
+    - Created modular `doPost(e)` and `doGet(e)` dispatcher with `LockService` and `CacheService` 120s deduplication lock.
+    - Implemented `send_order_placed` (strictly one confirmation per order), `send_order_confirmed` (admin approval notice), `send_order_dispatched` (including admin's `estimatedDeliveryDate`), `send_cart_abandoned` (10-hour urgency without coupon/discount codes), and Google Sheets logging.
+  - [x] **Frontend Configuration & Endpoint Reset** ([`src/lib/emailService.ts`](file:///Users/mmaazfalak/antigravity/Jutakapra_Frontend/src/lib/emailService.ts)):
+    - Reset `GAS_DEPLOYMENT_URL = ""` as an empty placeholder ready for new deployment.
+    - Added non-blocking safety check: when URL is empty, logs clean warning and skips network execution without crashing.
+  - [x] **Checkout Duplicate Prevention** ([`CheckoutView.tsx`](file:///Users/mmaazfalak/antigravity/Jutakapra_Frontend/src/views/CheckoutView.tsx), [`StoreContext.tsx`](file:///Users/mmaazfalak/antigravity/Jutakapra_Frontend/src/context/StoreContext.tsx)):
+    - Added synchronous `submissionLockRef` debounce preventing dual button taps and rapid submissions.
+    - Added `sentOrderEmailIds` set deduplication on client side.
+    - Passed `skipEmailNotification: true` to backend `/api/orders` to eliminate double confirmation emails.
+  - [x] **Admin Panel Enhancements** ([`AdminOrdersView.tsx`](file:///Users/mmaazfalak/antigravity/JutaKapra_backend/src/components/admin/AdminOrdersView.tsx), [`OrderFulfillmentModal.tsx`](file:///Users/mmaazfalak/antigravity/JutaKapra_backend/src/components/OrderFulfillmentModal.tsx)):
+    - Added "Confirm Order" button on pending orders triggering confirmation email.
+    - Added inline date picker input on confirmed orders for `estimatedDeliveryDate`.
+    - Added "Dispatch Order" action passing the date to courier dispatch API and customer email.
+  - [x] **10-Hour Cart Abandonment Logic** ([`server/controllers/cartController.ts`](file:///Users/mmaazfalak/antigravity/JutaKapra_backend/server/controllers/cartController.ts), [`server/server.ts`](file:///Users/mmaazfalak/antigravity/JutaKapra_backend/server/server.ts), [`vercel.json`](file:///Users/mmaazfalak/antigravity/JutaKapra_backend/vercel.json)):
+    - Configured strict 10-hour threshold (`TEN_HOURS_MS = 10 * 60 * 60 * 1000`) and subject *"Get your order delivered before someone else grabs it! | Juta Kapra"*.
+    - Added background 30-minute interval in Node server and hourly cron in `vercel.json`.
+    - Maintained strict prohibition against promo/discount codes.
+  - [x] **Deploy & Verify**: Both frontend and backend built with 0 errors and deployed to production.
+
+---
+
 ## 4. Next Steps
-1. Execute TypeScript typecheck and build in `Jutakapra_Frontend`.
-2. Commit and push frontend updates (`git push origin main`).
-3. Commit and push backend updates in `JutaKapra_backend` (`git push origin main`).
-4. Perform live end-to-end verification on [https://www.jutakapra.store](https://www.jutakapra.store).
+1. User provides new Google Apps Script deployment URL to paste into `GAS_DEPLOYMENT_URL` when ready.
+2. Monitor production orders and cart recovery logs on [https://www.jutakapra.store](https://www.jutakapra.store).

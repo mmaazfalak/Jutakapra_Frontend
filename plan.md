@@ -107,7 +107,32 @@ When a user logs in with Google OAuth:
 
 ---
 
-## 4. Verification & Testing Matrix
+## 4. Feature 3: Complete Email Lifecycle, Backend & Admin Panel Overhaul
+
+### 4.1 Problem Statement
+Previously, the store triggered duplicate or triplicate confirmation emails for each order due to concurrent frontend calls to Google Apps Script and backend webhook/SMTP triggers. Additionally, the admin interface lacked controls to confirm pending orders and specify an estimated delivery date on dispatch, and there was no background recovery for abandoned carts.
+
+### 4.2 Objective & Architecture
+1. **Google Apps Script Backend (`Code.gs`)**:
+   - Single dispatcher `doPost(e)` accepting explicit actions: `send_order_placed`, `send_order_confirmed`, `send_order_dispatched`, `send_cart_abandoned`, and `send_otp`.
+   - Concurrency lock (`LockService`) and 120-second deduplication cache (`CacheService`) to completely prevent duplicate sends.
+2. **Frontend Safety & URL Placeholder**:
+   - `GAS_DEPLOYMENT_URL` reset to empty string placeholder `""`.
+   - Safe execution guard skipping fetch with a warning when URL is empty, avoiding runtime crashes.
+3. **Double-Submission Lock on Checkout**:
+   - Synchronous `submissionLockRef` debounce preventing dual button taps and concurrent order generation.
+   - Client sends `skipEmailNotification: true` to `/api/orders` to eliminate backend duplicate confirmation emails.
+4. **Admin Dashboard Controls (`AdminOrdersView.tsx` & `OrderFulfillmentModal.tsx`)**:
+   - **Confirm Order Button**: Visible on pending orders; triggers status update to `Confirmed` and sends confirmation email.
+   - **Dispatch & Delivery Date Input**: Date picker on confirmed orders capturing `estimatedDeliveryDate`, dispatched via courier modal and embedded in customer notification email.
+5. **10-Hour Cart Abandonment Logic**:
+   - Scans FileDB/MongoDB for carts inactive for $\ge 10$ hours without prior notification.
+   - Background interval (30 min) in Node server + Vercel hourly cron route (`/api/cart/cron/abandoned-carts`).
+   - Subject: *"Get your order delivered before someone else grabs it! | Juta Kapra"*, with direct checkout link and strict prohibition against discount codes.
+
+---
+
+## 5. Verification & Testing Matrix
 
 - [ ] **Cart Navigation Test**: Click Bag on mobile dock -> navigates to `/cart`; verify `<Header />` and `<MobileAppNavBar />` remain visible.
 - [ ] **Desktop Floating Bag Test**: Click floating cart button on desktop -> navigates to `/cart`; button hides or stays neutral.

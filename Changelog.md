@@ -7,7 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [Unreleased]
+## [1.3.0] - 2026-11-05
+
+### Added
+- **Google Apps Script Backend Overhaul (`gas/Code.gs`)**: Standardized `doPost(e)` action handler supporting `send_order_placed`, `send_order_confirmed`, `send_order_dispatched`, `send_cart_abandoned`, and Google Sheets data synchronization with `CacheService` 120-second deduplication lock.
+- **Admin Estimated Delivery Date Dispatch**: Added inline date picker input on confirmed orders in `AdminOrdersView.tsx` and date selector in `OrderFulfillmentModal.tsx` passing estimated delivery date directly into the dispatch email.
+- **10-Hour Abandoned Cart Recovery**: Background scanner in `cartController.ts` and automated 30-minute interval worker in Node server + Vercel hourly cron triggering urgency reminder emails without promo or discount codes.
+- **Empty Deployment URL Fallback**: Safe fallback logic in frontend and backend `emailService.ts` when `GAS_DEPLOYMENT_URL` is empty, logging clean warnings instead of throwing runtime exceptions.
+
+### Changed
+- **Checkout Double-Submission Lock**: Wrapped `handleSubmitOrder` in `CheckoutView.tsx` with a synchronous lock (`submissionLockRef`) to eliminate rapid double clicks and concurrent submissions.
+- **Single Email Dispatch Pipeline**: Frontend `createOrder` passes `skipEmailNotification: true` to `/api/orders` to prevent backend duplicate email triggers.
+
+---
+
+## [1.2.2] - 2026-11-05
 
 ### Added
 - **Dedicated Shopping Bag Page View (`/cart`)**: Integrated the shopping bag directly as a full, dedicated view (`CartView`) keeping top navigation `<Header />` and bottom mobile dock `<MobileAppNavBar />` persistently visible and functional.
