@@ -26,6 +26,7 @@ import { normalizeOrderItem } from '../utils/orderItem';
 import { CheckoutGateModal } from '../components/CheckoutGateModal';
 import { AddressManager } from '../components/AddressManager';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
+import { safeFetchJson } from '../utils/api';
 
 export const CheckoutView: React.FC = () => {
   const {
@@ -215,8 +216,23 @@ export const CheckoutView: React.FC = () => {
       formData.fullName
     );
 
-    setTimeout(() => {
+    setTimeout(async () => {
       try {
+        const isTomPay = selectedGateway?.type === 'tompay' || selectedGateway?.id === 'gw-tompay';
+        if (isTomPay) {
+          try {
+            await safeFetchJson('/api/payments/tompay/create-session', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                amount: orderTotal,
+                currency: 'PKR',
+                customer: { ...formData },
+              }),
+            });
+          } catch {}
+        }
+
         const newOrder = createOrder({
           customer: { ...formData },
           items: [...cart],
@@ -224,7 +240,7 @@ export const CheckoutView: React.FC = () => {
           shipping: shippingFee,
           discount: 0,
           total: orderTotal,
-          paymentMethod: selectedGateway.type || selectedGateway.id,
+          paymentMethod: selectedGateway?.type || selectedGateway?.id || 'cod',
           status: 'Processing',
         });
         setCompletedOrder(newOrder);

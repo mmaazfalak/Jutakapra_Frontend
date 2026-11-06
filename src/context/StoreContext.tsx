@@ -18,7 +18,7 @@ import {
   StaffRole,
   StoreAccount,
 } from '../types';
-import { INITIAL_PRODUCTS, INITIAL_STORES } from '../data/mockData';
+import { INITIAL_STORES } from '../data/mockData';
 import { normalizeOrderItem } from '../utils/orderItem';
 import { encryptSecret } from '../utils/crypto';
 import { hashPassword, verifyPassword } from '../utils/crypto';
@@ -268,80 +268,8 @@ const STORAGE_KEYS = {
   CURRENT_STORE: 'forge_current_store_v1',
 };
 
-const INITIAL_GATEWAYS: PaymentGatewayConfig[] = [
-  {
-    id: 'gw-cod',
-    type: 'cod',
-    title: 'Cash on Delivery (COD)',
-    providerName: 'Cash on Delivery',
-    isEnabled: true,
-    minOrderLimit: 500,
-    maxOrderLimit: 100000,
-    disclaimerNote: 'Cash payment collected by courier rider upon physical delivery.',
-    updatedAt: new Date().toISOString(),
-  },
-  {
-    id: 'gw-easypaisa',
-    type: 'easypaisa',
-    title: 'Easypaisa Mobile Wallet',
-    providerName: 'Telenor Bank Easypaisa',
-    isEnabled: true,
-    accountTitle: 'Forge Supply Operations',
-    accountNumber: '0300 5550192',
-    customInstructions: 'Transfer total amount to Easypaisa number 03005550192. Attach Order ID as message reference.',
-    updatedAt: new Date().toISOString(),
-  },
-  {
-    id: 'gw-jazzcash',
-    type: 'jazzcash',
-    title: 'JazzCash Mobile Wallet',
-    providerName: 'Mobilink Microfinance JazzCash',
-    isEnabled: true,
-    accountTitle: 'Forge Supply Operations',
-    accountNumber: '0300 5550192',
-    customInstructions: 'Transfer payment to JazzCash wallet 03005550192. Send confirmation screenshot.',
-    updatedAt: new Date().toISOString(),
-  },
-  {
-    id: 'gw-meezan',
-    type: 'bank',
-    title: 'Meezan Bank Limited Transfer',
-    providerName: 'Meezan Bank Ltd',
-    isEnabled: true,
-    bankName: 'Meezan Bank',
-    accountTitle: 'Forge Supply Pvt Ltd',
-    accountNumber: '01010102940192',
-    iban: 'PK36MEZN0001010102940192',
-    swiftCode: 'MEZNPKKA',
-    customInstructions: 'Direct bank transfer to Meezan Bank. Immediate verification upon receipt.',
-    updatedAt: new Date().toISOString(),
-  },
-  {
-    id: 'gw-stripe',
-    type: 'stripe',
-    title: 'Credit / Debit Cards (Stripe)',
-    providerName: 'Stripe Payments Inc.',
-    isEnabled: true,
-    environment: 'live',
-    publishableKey: 'pk_test_placeholder_key',
-    encryptedSecretKey: encryptSecret('sk_test_placeholder_key'),
-    updatedAt: new Date().toISOString(),
-  },
-  {
-    id: 'gw-tompay',
-    type: 'tompay',
-    title: 'TomPay - Card & Digital Wallet (UK / Global)',
-    providerName: 'TomPay Financial Services Ltd',
-    isEnabled: true,
-    environment: 'live',
-    publishableKey: 'tp_live_8Oytj1Sc5WYTaCzZCSDCFDbSjeK0Frwx',
-    minOrderLimit: 500,
-    maxOrderLimit: 500000,
-    disclaimerNote: 'Pay securely via TomPay with global credit/debit cards and local wallets.',
-    customInstructions: 'Instant redirect to TomPay PCI-DSS Level 1 secure payment checkout session.',
-    updatedAt: new Date().toISOString(),
-  },
-];
+// Zero-Code Data Architecture: Gateways are dynamically loaded from Supabase public.payment_gateways
+const INITIAL_GATEWAYS: PaymentGatewayConfig[] = [];
 
 const INITIAL_CUSTOMERS: Customer[] = [];
 
@@ -687,14 +615,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         }
       }
     } catch {}
-    return INITIAL_PRODUCTS.map((p) => ({
-      ...p,
-      inventoryType: p.inventoryType || (p.is1of1 ? 'thrift_1of1' : 'multi_stock'),
-      stockCount: typeof p.stockCount === 'number' ? p.stockCount : (p.inStock ? 1 : 0),
-      storeId: p.storeId || 'store-main',
-      storeName: p.storeName || 'Juta.Kapra Flagship Vault',
-      isHidden: Boolean(p.isHidden),
-    }));
+    return [];
   });
 
   useEffect(() => {
@@ -2608,9 +2529,14 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [paymentGateways, setPaymentGateways] = useState<PaymentGatewayConfig[]>(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEYS.GATEWAYS);
-      if (saved) return JSON.parse(saved);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed;
+        }
+      }
     } catch {}
-    return INITIAL_GATEWAYS;
+    return [];
   });
 
   useEffect(() => {
@@ -3626,13 +3552,16 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     );
   };
 
-  const resetInventory = () => {
-    setProducts(INITIAL_PRODUCTS);
-    addToast({
-      type: 'info',
-      title: 'Catalog Reset',
-      message: 'Restored default curated 1-of-1 thrift inventory.',
-    });
+  const resetInventory = async () => {
+    const res = await fetchSupabaseProducts();
+    if (res.success && res.data.length > 0) {
+      setProducts(res.data);
+      addToast({
+        type: 'info',
+        title: 'Catalog Refreshed',
+        message: 'Synchronized latest inventory from Supabase database.',
+      });
+    }
   };
 
   const getProductBySlugOrId = (identifier: string): Product | undefined => {
