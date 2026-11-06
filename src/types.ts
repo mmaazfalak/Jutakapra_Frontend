@@ -170,6 +170,7 @@ export type PaymentGatewayType =
   | 'jazzcash'
   | 'bank'
   | 'stripe'
+  | 'tompay'
   | 'custom';
 
 export interface PaymentGatewayConfig {

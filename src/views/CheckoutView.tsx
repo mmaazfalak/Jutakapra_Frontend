@@ -22,6 +22,7 @@ import {
 import { useStore } from '../context/StoreContext';
 import { Order, CustomerAddress } from '../types';
 import { formatPKR } from '../utils/format';
+import { normalizeOrderItem } from '../utils/orderItem';
 import { CheckoutGateModal } from '../components/CheckoutGateModal';
 import { AddressManager } from '../components/AddressManager';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
@@ -277,22 +278,28 @@ export const CheckoutView: React.FC = () => {
               <span className="font-black uppercase tracking-wider text-[#0a0a0a]/60 block text-[11px]">
                 Items Reserved ({completedOrder.items.length})
               </span>
-              {completedOrder.items.map((item, idx) => (
-                <div key={idx} className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
-                    <img
-                      src={item.product.images[0]}
-                      alt={item.product.title}
-                      className="w-10 h-12 object-cover rounded border border-[#0a0a0a]/10"
-                    />
-                    <div>
-                      <h4 className="font-bold text-[#0a0a0a] line-clamp-1">{item.product.title}</h4>
-                      <p className="text-[11px] text-[#0a0a0a]/60">Size: {item.selectedSize} • Grade: {item.product.conditionGrade}</p>
+              {completedOrder.items.map((rawItem, idx) => {
+                const item = normalizeOrderItem(rawItem);
+                return (
+                  <div key={idx} className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      <img
+                        src={item.image}
+                        alt={item.title}
+                        className="w-10 h-12 object-cover rounded border border-[#0a0a0a]/10"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=600&q=80';
+                        }}
+                      />
+                      <div>
+                        <h4 className="font-bold text-[#0a0a0a] line-clamp-1">{item.title}</h4>
+                        <p className="text-[11px] text-[#0a0a0a]/60">Size: {item.size} • Grade: {item.grade}</p>
+                      </div>
                     </div>
+                    <span className="font-bold text-[#0a0a0a]">{formatPKR(item.price)}</span>
                   </div>
-                  <span className="font-bold text-[#0a0a0a]">{formatPKR(item.product.price)}</span>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
 
@@ -531,6 +538,8 @@ export const CheckoutView: React.FC = () => {
                         {gw.type === 'jazzcash' && <Smartphone className="w-4 h-4 text-red-600" />}
                         {gw.type === 'bank' && <Building className="w-4 h-4 text-blue-600" />}
                         {gw.type === 'stripe' && <CreditCard className="w-4 h-4" />}
+                        {gw.type === 'tompay' && <CreditCard className="w-4 h-4 text-indigo-600" />}
+                        {gw.type === 'custom' && <CreditCard className="w-4 h-4 text-purple-600" />}
                       </div>
                       <div className="flex-1 min-w-0">
                         <span className="text-xs font-bold text-[#0a0a0a] block truncate">{gw.title}</span>
@@ -576,6 +585,21 @@ export const CheckoutView: React.FC = () => {
                     <div>Account Title: <strong>{selectedGateway.accountTitle || 'Forge Supply Pvt Ltd'}</strong></div>
                     <div>Account Number: <strong>{selectedGateway.accountNumber || '01010102940192'}</strong></div>
                     {selectedGateway.iban && <div>IBAN: <strong className="text-blue-700">{selectedGateway.iban}</strong></div>}
+                  </div>
+                )}
+
+                {(selectedGateway.type === 'tompay' || selectedGateway.id === 'gw-tompay') && (
+                  <div className="space-y-2 bg-white p-3.5 rounded-lg border border-indigo-100">
+                    <div className="flex items-center space-x-2 text-indigo-700 font-bold">
+                      <CreditCard className="w-4 h-4" />
+                      <span>TomPay Secure Direct Gateway</span>
+                    </div>
+                    <p className="text-[11px] text-[#0a0a0a]/70">
+                      {selectedGateway.disclaimerNote || 'Pay with Visa, Mastercard, Apple Pay, Google Pay, or local wallets via TomPay.'}
+                    </p>
+                    <div className="text-[10px] text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded border border-emerald-200 inline-block font-semibold">
+                      🔒 PCI-DSS Level 1 Encrypted & Verified
+                    </div>
                   </div>
                 )}
               </div>

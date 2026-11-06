@@ -30,6 +30,7 @@ import { useStore } from '../context/StoreContext';
 import { formatPKR } from '../utils/format';
 import { AddressManager } from '../components/AddressManager';
 import { OrderStatus } from '../types';
+import { normalizeOrderItem } from '../utils/orderItem';
 
 type AccountTab = 'overview' | 'orders' | 'addresses' | 'security';
 type OrderFilterType = 'all' | 'processing' | 'confirmed' | 'dispatched' | 'delivered';
@@ -194,7 +195,7 @@ export const AccountView: React.FC = () => {
       trackingNo.includes(q) ||
       courierPartner.includes(q) ||
       dispatchNote.includes(q) ||
-      ord.items.some((it) => it.product.title.toLowerCase().includes(q));
+      ord.items.some((it) => normalizeOrderItem(it).title.toLowerCase().includes(q));
 
     if (!matchesSearch) return false;
 
@@ -872,28 +873,34 @@ export const AccountView: React.FC = () => {
 
                         {/* Order Items */}
                         <div className="space-y-2">
-                          {ord.items.map((it, idx) => (
-                            <div key={idx} className="flex items-center justify-between text-xs">
-                              <div className="flex items-center gap-3 min-w-0">
-                                <img
-                                  src={it.product.images[0]}
-                                  alt={it.product.title}
-                                  className="w-10 h-10 rounded-lg object-cover border border-neutral-200 dark:border-neutral-800 bg-neutral-100 dark:bg-neutral-800 shrink-0"
-                                />
-                                <div className="min-w-0">
-                                  <p className="font-bold text-neutral-950 dark:text-white truncate">
-                                    {it.product.title}
-                                  </p>
-                                  <p className="text-[11px] text-neutral-600 dark:text-neutral-400 font-medium">
-                                    Size <span className="font-bold text-neutral-900 dark:text-white">{it.selectedSize}</span> • Qty {it.quantity}
-                                  </p>
+                          {ord.items.map((rawIt, idx) => {
+                            const it = normalizeOrderItem(rawIt);
+                            return (
+                              <div key={idx} className="flex items-center justify-between text-xs">
+                                <div className="flex items-center gap-3 min-w-0">
+                                  <img
+                                    src={it.image}
+                                    alt={it.title}
+                                    className="w-10 h-10 rounded-lg object-cover border border-neutral-200 dark:border-neutral-800 bg-neutral-100 dark:bg-neutral-800 shrink-0"
+                                    onError={(e) => {
+                                      (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=600&q=80';
+                                    }}
+                                  />
+                                  <div className="min-w-0">
+                                    <p className="font-bold text-neutral-950 dark:text-white truncate">
+                                      {it.title}
+                                    </p>
+                                    <p className="text-[11px] text-neutral-600 dark:text-neutral-400 font-medium">
+                                      Size <span className="font-bold text-neutral-900 dark:text-white">{it.size}</span> • Qty {it.quantity}
+                                    </p>
+                                  </div>
                                 </div>
+                                <span className="font-mono font-bold text-neutral-950 dark:text-white shrink-0 pl-2">
+                                  {formatPKR(it.totalPrice)}
+                                </span>
                               </div>
-                              <span className="font-mono font-bold text-neutral-950 dark:text-white shrink-0 pl-2">
-                                {formatPKR(it.product.price * it.quantity)}
-                              </span>
-                            </div>
-                          ))}
+                            );
+                          })}
                         </div>
 
                         {/* Order Footer Details */}

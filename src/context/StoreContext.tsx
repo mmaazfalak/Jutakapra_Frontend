@@ -19,6 +19,7 @@ import {
   StoreAccount,
 } from '../types';
 import { INITIAL_PRODUCTS, INITIAL_STORES } from '../data/mockData';
+import { normalizeOrderItem } from '../utils/orderItem';
 import { encryptSecret } from '../utils/crypto';
 import { hashPassword, verifyPassword } from '../utils/crypto';
 import {
@@ -37,6 +38,14 @@ import {
   deleteSupabaseStore,
   toggleSupabaseStoreVisibility,
   seedInitialStoresToSupabase,
+  fetchSupabaseProducts,
+  syncSupabaseProduct,
+  deleteSupabaseProduct,
+  seedInitialProductsToSupabase,
+  fetchSupabasePaymentGateways,
+  syncSupabasePaymentGateway,
+  deleteSupabasePaymentGateway,
+  seedInitialGatewaysToSupabase,
 } from '../lib/supabase';
 import { verifyGoogleCredentialWithBackend } from '../lib/googleAuth';
 import { safeFetchJson, getApiUrl } from '../utils/api';
@@ -316,6 +325,20 @@ const INITIAL_GATEWAYS: PaymentGatewayConfig[] = [
     environment: 'live',
     publishableKey: 'pk_test_placeholder_key',
     encryptedSecretKey: encryptSecret('sk_test_placeholder_key'),
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    id: 'gw-tompay',
+    type: 'tompay',
+    title: 'TomPay - Card & Digital Wallet (UK / Global)',
+    providerName: 'TomPay Financial Services Ltd',
+    isEnabled: true,
+    environment: 'live',
+    publishableKey: 'tp_live_8Oytj1Sc5WYTaCzZCSDCFDbSjeK0Frwx',
+    minOrderLimit: 500,
+    maxOrderLimit: 500000,
+    disclaimerNote: 'Pay securely via TomPay with global credit/debit cards and local wallets.',
+    customInstructions: 'Instant redirect to TomPay PCI-DSS Level 1 secure payment checkout session.',
     updatedAt: new Date().toISOString(),
   },
 ];
@@ -1021,18 +1044,37 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       // 2. Sync orders from all database bases (Backend API + Supabase)
       const orderSync = await refreshOrders();
 
-      // 3. Fetch fresh products from backend API if available
+      // 3. Fetch fresh products from Supabase & Backend API
       try {
-        const prodRes = await safeFetchJson<any>('/api/products', { method: 'GET' });
-        if (prodRes.ok && prodRes.data) {
-          const raw = prodRes.data;
-          const list = Array.isArray(raw) ? raw : (raw?.products && Array.isArray(raw.products) ? raw.products : []);
-          if (list.length > 0) {
-            setProducts(list);
-            try {
-              localStorage.setItem(STORAGE_KEYS.PRODUCTS, JSON.stringify(list));
-            } catch {}
+        const supaProds = await fetchSupabaseProducts();
+        if (supaProds.success && supaProds.data.length > 0) {
+          setProducts(supaProds.data);
+          try {
+            localStorage.setItem(STORAGE_KEYS.PRODUCTS, JSON.stringify(supaProds.data));
+          } catch {}
+        } else {
+          const prodRes = await safeFetchJson<any>('/api/products', { method: 'GET' });
+          if (prodRes.ok && prodRes.data) {
+            const raw = prodRes.data;
+            const list = Array.isArray(raw) ? raw : (raw?.products && Array.isArray(raw.products) ? raw.products : []);
+            if (list.length > 0) {
+              setProducts(list);
+              try {
+                localStorage.setItem(STORAGE_KEYS.PRODUCTS, JSON.stringify(list));
+              } catch {}
+            }
           }
+        }
+      } catch {}
+
+      // 3b. Fetch fresh payment gateways from Supabase
+      try {
+        const supaGateways = await fetchSupabasePaymentGateways();
+        if (supaGateways.success && supaGateways.data.length > 0) {
+          setPaymentGateways(supaGateways.data);
+          try {
+            localStorage.setItem(STORAGE_KEYS.GATEWAYS, JSON.stringify(supaGateways.data));
+          } catch {}
         }
       } catch {}
 
@@ -1360,11 +1402,68 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       )
       .subscribe();
 
+    // Realtime Postgres Changes Subscription for Products
+    const productsChannel = supabase
+      .channel('realtime:public:products')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'products' },
+        async () => {
+          const res = await fetchSupabaseProducts();
+          if (res.success && res.data.length > 0) {
+            setProducts(res.data);
+            try {
+              localStorage.setItem(STORAGE_KEYS.PRODUCTS, JSON.stringify(res.data));
+            } catch {}
+          }
+        }
+      )
+      .subscribe();
+
+    // Realtime Postgres Changes Subscription for Payment Gateways
+    const gatewaysChannel = supabase
+      .channel('realtime:public:payment_gateways')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'payment_gateways' },
+        async () => {
+          const res = await fetchSupabasePaymentGateways();
+          if (res.success && res.data.length > 0) {
+            setPaymentGateways(res.data);
+            try {
+              localStorage.setItem(STORAGE_KEYS.GATEWAYS, JSON.stringify(res.data));
+            } catch {}
+          }
+        }
+      )
+      .subscribe();
+
+    // Initial Fetch of Products & Gateways from Supabase
+    fetchSupabaseProducts().then((res) => {
+      if (res.success && res.data.length > 0) {
+        setProducts(res.data);
+        try {
+          localStorage.setItem(STORAGE_KEYS.PRODUCTS, JSON.stringify(res.data));
+        } catch {}
+      }
+    });
+
+    fetchSupabasePaymentGateways().then((res) => {
+      if (res.success && res.data.length > 0) {
+        setPaymentGateways(res.data);
+        try {
+          localStorage.setItem(STORAGE_KEYS.GATEWAYS, JSON.stringify(res.data));
+        } catch {}
+      }
+    });
+
     return () => {
       isMounted = false;
       authListener.subscription.unsubscribe();
       supabase.removeChannel(profileChannel);
       supabase.removeChannel(orderChannel);
+      supabase.removeChannel(productsChannel);
+      supabase.removeChannel(gatewaysChannel);
     };
   }, []);
 
@@ -2675,14 +2774,42 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       data.customer
     );
 
+    const enrichedItems = (data.items || []).map((it: any) => {
+      const norm = normalizeOrderItem(it);
+      return {
+        product: it.product || {
+          id: norm.id,
+          title: norm.title,
+          price: norm.price,
+          size: norm.size,
+          conditionGrade: norm.grade,
+          era: norm.era,
+          images: [norm.image],
+        },
+        quantity: norm.quantity,
+        selectedSize: norm.size,
+        title: norm.title,
+        name: norm.title,
+        price: norm.price,
+        image: norm.image,
+      };
+    });
+
     const newOrder: Order = {
       ...data,
+      items: enrichedItems,
       id: 'ord-' + Date.now().toString(36),
       orderNumber,
       customerId: customer.id,
       status: 'Pending',
       createdAt: new Date().toISOString(),
     };
+
+    if (typeof window !== 'undefined' && data.customer?.email) {
+      try {
+        localStorage.setItem('juta_last_customer_email', data.customer.email.toLowerCase().trim());
+      } catch {}
+    }
 
     setCustomers((prev) =>
       prev.map((c) => {
@@ -2970,6 +3097,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     };
 
     setPaymentGateways((prev) => [...prev, newGateway]);
+    syncSupabasePaymentGateway(newGateway).catch(() => {});
 
     addAuditLog({
       provider: 'SECURITY_SWITCHBOARD',
@@ -2989,7 +3117,14 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   const updatePaymentGateway = (id: string, updates: Partial<PaymentGatewayConfig>) => {
     setPaymentGateways((prev) =>
-      prev.map((g) => (g.id === id ? { ...g, ...updates, updatedAt: new Date().toISOString() } : g))
+      prev.map((g) => {
+        if (g.id === id) {
+          const updated = { ...g, ...updates, updatedAt: new Date().toISOString() };
+          syncSupabasePaymentGateway(updated).catch(() => {});
+          return updated;
+        }
+        return g;
+      })
     );
 
     addAuditLog({
@@ -3011,6 +3146,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const deletePaymentGateway = (id: string) => {
     const target = paymentGateways.find((g) => g.id === id);
     setPaymentGateways((prev) => prev.filter((g) => g.id !== id));
+    deleteSupabasePaymentGateway(id).catch(() => {});
 
     addAuditLog({
       provider: 'SECURITY_SWITCHBOARD',
@@ -3033,12 +3169,14 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       prev.map((g) => {
         if (g.id === id) {
           const isEnabled = !g.isEnabled;
+          const updated = { ...g, isEnabled, updatedAt: new Date().toISOString() };
+          syncSupabasePaymentGateway(updated).catch(() => {});
           addToast({
             type: isEnabled ? 'success' : 'info',
             title: isEnabled ? 'Gateway Enabled' : 'Gateway Disabled',
             message: `"${g.title}" is now ${isEnabled ? 'visible at checkout' : 'hidden from checkout'}.`,
           });
-          return { ...g, isEnabled, updatedAt: new Date().toISOString() };
+          return updated;
         }
         return g;
       })
@@ -3395,6 +3533,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       isHidden: Boolean(newProdData.isHidden),
     };
     setProducts((prev) => [newProduct, ...prev]);
+    syncSupabaseProduct(newProduct).catch(() => {});
     addToast({
       type: 'success',
       title: 'Product Published',
@@ -3414,6 +3553,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             const matchingStore = stores.find((s) => s.id === updates.storeId);
             if (matchingStore) updated.storeName = matchingStore.name;
           }
+          syncSupabaseProduct(updated).catch(() => {});
           return updated;
         }
         return p;
@@ -3429,6 +3569,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const deleteProduct = (id: string) => {
     const target = products.find((p) => p.id === id);
     setProducts((prev) => prev.filter((p) => p.id !== id));
+    deleteSupabaseProduct(id).catch(() => {});
     addToast({
       type: 'info',
       title: 'Product Removed',

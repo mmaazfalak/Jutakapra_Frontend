@@ -29,6 +29,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { useStore } from '../context/StoreContext';
 import { formatPKR } from '../utils/format';
 import { Order, OrderStatus } from '../types';
+import { normalizeOrderItem } from '../utils/orderItem';
 
 export const CustomerOrdersView: React.FC = () => {
   const { orders, currentCustomer, profile, navigateTo, openAuthModal, addToast, refreshOrders } = useStore();
@@ -43,10 +44,11 @@ export const CustomerOrdersView: React.FC = () => {
 
   const cleanQuery = searchQuery.trim().toLowerCase();
 
-  // Strict Privacy & Order Association:
+  // Strict Privacy & Order Association (with guest session fallback):
   let userOrders: Order[] = [];
 
-  const activeUserEmail = profile?.email || currentCustomer?.email;
+  const storedGuestEmail = typeof window !== 'undefined' ? (localStorage.getItem('juta_last_customer_email') || localStorage.getItem('guest_order_email') || '') : '';
+  const activeUserEmail = profile?.email || currentCustomer?.email || storedGuestEmail;
   const activeUserId = profile?.id || currentCustomer?.id;
 
   if (activeUserEmail || activeUserId) {
@@ -64,7 +66,8 @@ export const CustomerOrdersView: React.FC = () => {
         (o.courierTracking?.trackingNumber && o.courierTracking.trackingNumber.toLowerCase() === cleanQuery)
     );
   } else {
-    userOrders = [];
+    // If not logged in and no query, show recent local orders if any
+    userOrders = orders;
   }
 
   // Search filter
@@ -541,31 +544,37 @@ export const CustomerOrdersView: React.FC = () => {
                   </span>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {ord.items.map((it, idx) => (
-                      <div
-                        key={idx}
-                        className="flex items-center space-x-3.5 p-3 rounded-xl border border-neutral-200/80 bg-neutral-50/50 hover:bg-neutral-50 transition-colors"
-                      >
-                        <img
-                          src={it.product.images[0]}
-                          alt={it.product.title}
-                          className="w-14 h-14 object-cover rounded-xl bg-neutral-200 border border-neutral-200/80 shrink-0"
-                        />
-                        <div className="min-w-0 flex-1 space-y-0.5">
-                          <h5 className="font-bold text-xs text-[#0a0a0a] truncate">
-                            {it.product.title}
-                          </h5>
-                          <div className="flex items-center space-x-2 text-[11px] text-neutral-500 font-medium">
-                            <span>Size: <strong>{it.selectedSize || it.product.size}</strong></span>
-                            <span>•</span>
-                            <span>Grade: {it.product.conditionGrade}</span>
+                    {ord.items.map((rawItem, idx) => {
+                      const item = normalizeOrderItem(rawItem);
+                      return (
+                        <div
+                          key={idx}
+                          className="flex items-center space-x-3.5 p-3 rounded-xl border border-neutral-200/80 bg-neutral-50/50 hover:bg-neutral-50 transition-colors"
+                        >
+                          <img
+                            src={item.image}
+                            alt={item.title}
+                            className="w-14 h-14 object-cover rounded-xl bg-neutral-200 border border-neutral-200/80 shrink-0"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=600&q=80';
+                            }}
+                          />
+                          <div className="min-w-0 flex-1 space-y-0.5">
+                            <h5 className="font-bold text-xs text-[#0a0a0a] truncate">
+                              {item.title}
+                            </h5>
+                            <div className="flex items-center space-x-2 text-[11px] text-neutral-500 font-medium">
+                              <span>Size: <strong>{item.size}</strong></span>
+                              <span>•</span>
+                              <span>Grade: {item.grade}</span>
+                            </div>
+                            <span className="font-black text-xs text-[#0a0a0a] block">
+                              {formatPKR(item.price)}
+                            </span>
                           </div>
-                          <span className="font-black text-xs text-[#0a0a0a] block">
-                            {formatPKR(it.product.price)}
-                          </span>
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </div>
 
