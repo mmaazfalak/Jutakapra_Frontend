@@ -64,8 +64,15 @@ export const CheckoutView: React.FC = () => {
 
   const [shippingMethod, setShippingMethod] = useState<'standard' | 'express' | 'pickup'>('standard');
   const [selectedGatewayId, setSelectedGatewayId] = useState<string>(() => {
-    return activeGateways.length > 0 ? activeGateways[0].id : 'cod';
+    return activeGateways.length > 0 ? activeGateways[0].id : 'gw-cod';
   });
+
+  // Guarantee active gateway is always selected when gateways load
+  useEffect(() => {
+    if (activeGateways.length > 0 && (!selectedGatewayId || !activeGateways.some((g) => g.id === selectedGatewayId))) {
+      setSelectedGatewayId(activeGateways[0].id);
+    }
+  }, [activeGateways, selectedGatewayId]);
 
   const [completedOrder, setCompletedOrder] = useState<Order | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -216,12 +223,12 @@ export const CheckoutView: React.FC = () => {
       formData.fullName
     );
 
-    setTimeout(async () => {
+    (async () => {
       try {
         const isTomPay = selectedGateway?.type === 'tompay' || selectedGateway?.id === 'gw-tompay';
         if (isTomPay) {
           try {
-            await safeFetchJson('/api/payments/tompay/create-session', {
+            const tompayRes = await safeFetchJson<any>('/api/payments/tompay/create-session', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
@@ -230,7 +237,23 @@ export const CheckoutView: React.FC = () => {
                 customer: { ...formData },
               }),
             });
-          } catch {}
+            if (tompayRes.ok && tompayRes.data?.sessionUrl) {
+              createOrder({
+                customer: { ...formData },
+                items: [...cart],
+                subtotal: cartSubtotal,
+                shipping: shippingFee,
+                discount: 0,
+                total: orderTotal,
+                paymentMethod: 'tompay',
+                status: 'Pending',
+              });
+              window.location.href = tompayRes.data.sessionUrl;
+              return;
+            }
+          } catch (err) {
+            console.warn('TomPay redirect note:', err);
+          }
         }
 
         const newOrder = createOrder({
@@ -247,7 +270,7 @@ export const CheckoutView: React.FC = () => {
       } finally {
         setIsSubmitting(false);
       }
-    }, 800);
+    })();
   };
 
   // Receipt view upon completion
@@ -536,7 +559,7 @@ export const CheckoutView: React.FC = () => {
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {activeGateways.map((gw) => {
-                  const isSelected = selectedGatewayId === gw.id;
+                  const isSelected = (selectedGateway?.id || selectedGatewayId) === gw.id;
                   return (
                     <button
                       key={gw.id}

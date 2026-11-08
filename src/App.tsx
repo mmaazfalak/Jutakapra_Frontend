@@ -11,8 +11,12 @@ const QuickViewModal = lazyWithRetry(() => import('./components/QuickViewModal')
 const CommandKModal = lazyWithRetry(() => import('./components/CommandKModal').then((m) => ({ default: m.CommandKModal })));
 const CheckoutGateModal = lazyWithRetry(() => import('./components/CheckoutGateModal').then((m) => ({ default: m.CheckoutGateModal })));
 
-// HomeView is loaded eagerly for instant above-the-fold First Contentful Paint
+// Core views loaded eagerly for instant 0ms route transitions
 import { HomeView } from './views/HomeView';
+import { ShopView } from './views/ShopView';
+import { ProductDetailView } from './views/ProductDetailView';
+import { CartView } from './views/CartView';
+import { CheckoutView } from './views/CheckoutView';
 
 // Auto-retry wrapper for dynamic imports to seamlessly handle post-deployment chunk hash changes
 function lazyWithRetry<T extends React.ComponentType<any>>(factory: () => Promise<{ default: T }>) {
@@ -39,11 +43,7 @@ function lazyWithRetry<T extends React.ComponentType<any>>(factory: () => Promis
   });
 }
 
-// Route-based code-splitting: Views load lazily on demand with auto-recovery from stale builds
-const ShopView = lazyWithRetry(() => import('./views/ShopView').then((m) => ({ default: m.ShopView })));
-const ProductDetailView = lazyWithRetry(() => import('./views/ProductDetailView').then((m) => ({ default: m.ProductDetailView })));
-const CartView = lazyWithRetry(() => import('./views/CartView').then((m) => ({ default: m.CartView })));
-const CheckoutView = lazyWithRetry(() => import('./views/CheckoutView').then((m) => ({ default: m.CheckoutView })));
+// Secondary views loaded on-demand and prewarmed during browser idle time
 const ConditionGuideView = lazyWithRetry(() => import('./views/ConditionGuideView').then((m) => ({ default: m.ConditionGuideView })));
 const DropsView = lazyWithRetry(() => import('./views/DropsView').then((m) => ({ default: m.DropsView })));
 const ContactView = lazyWithRetry(() => import('./views/ContactView').then((m) => ({ default: m.ContactView })));
@@ -71,10 +71,30 @@ const ViewSkeleton: React.FC = () => (
 const MainApp: React.FC = () => {
   const { currentView, quickViewProduct, isCommandKOpen, isCheckoutGateOpen } = useStore();
 
-  // Scroll to top on view change
+  // Instant scroll to top on view change (eliminates slow smooth-scroll lag during route switches)
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
   }, [currentView]);
+
+  // Idle prewarm secondary views so they open immediately with 0ms loading spinner
+  useEffect(() => {
+    const prewarmSecondaryViews = () => {
+      import('./views/CustomerOrdersView');
+      import('./views/AccountView');
+      import('./views/LoginView');
+      import('./views/RegisterView');
+      import('./views/DropsView');
+      import('./views/ConditionGuideView');
+    };
+
+    if (typeof window !== 'undefined') {
+      if ('requestIdleCallback' in window) {
+        (window as any).requestIdleCallback(prewarmSecondaryViews, { timeout: 2500 });
+      } else {
+        setTimeout(prewarmSecondaryViews, 1500);
+      }
+    }
+  }, []);
 
   // Route redirect for Admin requests - links to the separate backend admin portal
   useEffect(() => {

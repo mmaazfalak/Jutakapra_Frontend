@@ -173,7 +173,7 @@ INSERT INTO public.payment_gateways (
   iban, swift_code, bank_name, min_order_limit, max_order_limit, disclaimer_note, custom_instructions,
   publishable_key, updated_at
 ) VALUES (
-  'gw-tompay', 'tompay', 'TomPay - Card & Digital Wallet (UK / Global)', 'TomPay Financial Services Ltd', TRUE, 'live', NULL, NULL, NULL, NULL, NULL, 500, 500000, 'Pay securely via TomPay with global credit/debit cards and local wallets.', 'Instant redirect to TomPay PCI-DSS Level 1 secure payment checkout session.', 'tp_live_8Oytj1Sc5WYTaCzZCSDCFDbSjeK0Frwx', NOW()
+  'gw-tompay', 'tompay', 'TomPay - Card & Digital Wallet (UK / Global)', 'TomPay Financial Services Ltd', TRUE, 'live', NULL, NULL, NULL, NULL, NULL, 500, 500000, 'Pay securely via TomPay with global credit/debit cards and local wallets.', 'Instant redirect to TomPay PCI-DSS Level 1 secure payment checkout session.', 'tp_live_0Rwf4QnZIY8nOEHunJoenOnqu9olG28D', NOW()
 ) ON CONFLICT (id) DO UPDATE SET
   title = EXCLUDED.title,
   provider_name = EXCLUDED.provider_name,

@@ -109,13 +109,27 @@ export const HomeView: React.FC = () => {
         </div>
 
         {/* 4-up grid: on mobile 3 items, on tablet/desktop 4 items */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-          {trendingProducts.map((prod, idx) => (
-            <div key={prod.id} className={idx === 3 ? 'hidden sm:block' : 'block'}>
-              <ProductCard product={prod} priority={idx < 2} />
-            </div>
-          ))}
-        </div>
+        {trendingProducts.length === 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 animate-pulse">
+            {[1, 2, 3, 4].map((n) => (
+              <div key={n} className="rounded-xl sm:rounded-2xl border border-[#0a0a0a]/10 overflow-hidden bg-neutral-100">
+                <div className="aspect-[4/5] bg-neutral-200" />
+                <div className="p-4 space-y-2">
+                  <div className="h-4 bg-neutral-200 rounded w-3/4" />
+                  <div className="h-3 bg-neutral-200 rounded w-1/2" />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+            {trendingProducts.map((prod, idx) => (
+              <div key={prod.id} className={idx === 3 ? 'hidden sm:block' : 'block'}>
+                <ProductCard product={prod} priority={idx < 2} />
+              </div>
+            ))}
+          </div>
+        )}
       </section>
 
       {/* =========================================================================

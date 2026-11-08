@@ -105,8 +105,17 @@ export const ShopView: React.FC = () => {
           if (!p.isHotDeal && !(p.originalPrice && p.originalPrice > p.price)) {
             return false;
           }
-        } else if (selectedCategory !== 'All Vintage' && p.category !== selectedCategory) {
-          return false;
+        } else if (selectedCategory !== 'All Vintage') {
+          const matchDirect = p.category === selectedCategory;
+          const matchBroad =
+            (selectedCategory === 'Sneakers & Boots' && (p.category === 'Footwear' || p.category === 'Sneakers & Boots' || p.subcategory === 'Sneakers' || p.subcategory === 'Boots')) ||
+            (selectedCategory === 'Vintage Tees & Trousers' && (p.category === 'Vintage Tees & Trousers' || p.subcategory === 'Graphic Tees' || p.subcategory === 'Shirts' || p.subcategory === 'Hoodies & Sweats')) ||
+            (selectedCategory === 'Workwear & Jeans' && (p.category === 'Workwear & Jeans' || p.subcategory === 'Workwear & Jackets' || p.tags.some(t => t.toLowerCase().includes('workwear')))) ||
+            (selectedCategory === 'Jackets & Coats' && (p.category === 'Jackets & Coats' || p.subcategory === 'Outerwear' || p.subcategory === 'Leather & Outerwear')) ||
+            (selectedCategory === 'Accessories' && (p.category === 'Accessories' || p.subcategory === 'Eyewear' || p.subcategory === 'Bags' || p.subcategory === 'Scarves & Silks'));
+          if (!matchDirect && !matchBroad) {
+            return false;
+          }
         }
 
         // Subcategory for Accessories

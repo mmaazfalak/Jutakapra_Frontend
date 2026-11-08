@@ -268,8 +268,70 @@ const STORAGE_KEYS = {
   CURRENT_STORE: 'forge_current_store_v1',
 };
 
-// Zero-Code Data Architecture: Gateways are dynamically loaded from Supabase public.payment_gateways
-const INITIAL_GATEWAYS: PaymentGatewayConfig[] = [];
+// Zero-Code Data Architecture: Gateways are dynamically loaded from Supabase public.payment_gateways with instant local fallback
+const INITIAL_GATEWAYS: PaymentGatewayConfig[] = [
+  {
+    id: 'gw-cod',
+    type: 'cod',
+    title: 'Cash on Delivery (COD)',
+    providerName: 'Cash on Delivery',
+    isEnabled: true,
+    minOrderLimit: 500,
+    maxOrderLimit: 100000,
+    disclaimerNote: 'Cash payment collected by courier rider upon physical delivery.',
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    id: 'gw-easypaisa',
+    type: 'easypaisa',
+    title: 'Easypaisa Mobile Wallet',
+    providerName: 'Telenor Bank Easypaisa',
+    isEnabled: true,
+    accountTitle: 'Forge Supply Operations',
+    accountNumber: '0300 5550192',
+    customInstructions: 'Transfer total amount to Easypaisa number 03005550192. Attach Order ID as message reference.',
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    id: 'gw-jazzcash',
+    type: 'jazzcash',
+    title: 'JazzCash Mobile Wallet',
+    providerName: 'Mobilink Microfinance JazzCash',
+    isEnabled: true,
+    accountTitle: 'Forge Supply Operations',
+    accountNumber: '0300 5550192',
+    customInstructions: 'Transfer payment to JazzCash wallet 03005550192. Send confirmation screenshot.',
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    id: 'gw-meezan',
+    type: 'bank',
+    title: 'Meezan Bank Limited Transfer',
+    providerName: 'Meezan Bank Ltd',
+    isEnabled: true,
+    bankName: 'Meezan Bank',
+    accountTitle: 'Forge Supply Pvt Ltd',
+    accountNumber: '01010102940192',
+    iban: 'PK36MEZN0001010102940192',
+    swiftCode: 'MEZNPKKA',
+    customInstructions: 'Direct bank transfer to Meezan Bank. Immediate verification upon receipt.',
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    id: 'gw-tompay',
+    type: 'tompay',
+    title: 'TomPay - Card & Digital Wallet (UK / Global)',
+    providerName: 'TomPay Financial Services Ltd',
+    isEnabled: true,
+    environment: 'live',
+    publishableKey: 'tp_live_0Rwf4QnZIY8nOEHunJoenOnqu9olG28D',
+    minOrderLimit: 500,
+    maxOrderLimit: 500000,
+    disclaimerNote: 'Pay securely via TomPay with global credit/debit cards and local wallets.',
+    customInstructions: 'Instant redirect to TomPay PCI-DSS Level 1 secure payment checkout session.',
+    updatedAt: new Date().toISOString(),
+  },
+];
 
 const INITIAL_CUSTOMERS: Customer[] = [];
 
@@ -615,7 +677,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         }
       }
     } catch {}
-    return [];
+    return INITIAL_PRODUCTS;
   });
 
   useEffect(() => {
@@ -1070,22 +1132,6 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       }
     };
     restoreSession();
-
-    // Non-blocking background sync of products after initial paint (0ms latency for user)
-    setTimeout(() => {
-      safeFetchJson<any>('/api/products', { method: 'GET' }).then((prodRes) => {
-        if (prodRes.ok && prodRes.data) {
-          const raw = prodRes.data;
-          const list = Array.isArray(raw) ? raw : (raw?.products && Array.isArray(raw.products) ? raw.products : []);
-          if (list.length > 0) {
-            setProducts(list);
-            try {
-              localStorage.setItem(STORAGE_KEYS.PRODUCTS, JSON.stringify(list));
-            } catch {}
-          }
-        }
-      }).catch(() => {});
-    }, 1200);
   }, []);
 
   // Supabase Auth Listener & Bootstrap (Reactive Profile & Avatar)
@@ -1350,31 +1396,43 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         async () => {
           const res = await fetchSupabasePaymentGateways();
           if (res.success && res.data.length > 0) {
-            setPaymentGateways(res.data);
+            const hasTomPay = res.data.some((g: PaymentGatewayConfig) => g.id === 'gw-tompay' || g.type === 'tompay');
+            const finalData = hasTomPay
+              ? res.data
+              : [...res.data, INITIAL_GATEWAYS.find((g) => g.id === 'gw-tompay')!].filter(Boolean);
+            setPaymentGateways(finalData);
             try {
-              localStorage.setItem(STORAGE_KEYS.GATEWAYS, JSON.stringify(res.data));
+              localStorage.setItem(STORAGE_KEYS.GATEWAYS, JSON.stringify(finalData));
             } catch {}
           }
         }
       )
       .subscribe();
 
-    // Initial Fetch of Products & Gateways from Supabase
+    // Initial Fetch of Products & Gateways from Supabase (Dynamic source of truth)
     fetchSupabaseProducts().then((res) => {
       if (res.success && res.data.length > 0) {
         setProducts(res.data);
         try {
           localStorage.setItem(STORAGE_KEYS.PRODUCTS, JSON.stringify(res.data));
         } catch {}
+      } else if (res.success && res.data.length === 0) {
+        seedInitialProductsToSupabase(INITIAL_PRODUCTS);
       }
     });
 
     fetchSupabasePaymentGateways().then((res) => {
       if (res.success && res.data.length > 0) {
-        setPaymentGateways(res.data);
+        const hasTomPay = res.data.some((g: PaymentGatewayConfig) => g.id === 'gw-tompay' || g.type === 'tompay');
+        const finalData = hasTomPay
+          ? res.data
+          : [...res.data, INITIAL_GATEWAYS.find((g) => g.id === 'gw-tompay')!].filter(Boolean);
+        setPaymentGateways(finalData);
         try {
-          localStorage.setItem(STORAGE_KEYS.GATEWAYS, JSON.stringify(res.data));
+          localStorage.setItem(STORAGE_KEYS.GATEWAYS, JSON.stringify(finalData));
         } catch {}
+      } else if (res.success && res.data.length === 0) {
+        seedInitialGatewaysToSupabase(INITIAL_GATEWAYS);
       }
     });
 
@@ -2532,11 +2590,16 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) {
+          const hasTomPay = parsed.some((g: PaymentGatewayConfig) => g.id === 'gw-tompay' || g.type === 'tompay');
+          if (!hasTomPay) {
+            const tomPayGw = INITIAL_GATEWAYS.find((g) => g.id === 'gw-tompay');
+            if (tomPayGw) return [...parsed, tomPayGw];
+          }
           return parsed;
         }
       }
     } catch {}
-    return [];
+    return INITIAL_GATEWAYS;
   });
 
   useEffect(() => {
