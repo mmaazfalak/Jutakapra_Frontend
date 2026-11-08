@@ -186,7 +186,7 @@ INSERT INTO public.payment_gateways (
   updated_at = NOW();
 
 -- ------------------------------------------------------------------------------
--- 4. SEED 13 AI-GENERATED 1-OF-1 ARCHIVAL VINTAGE PRODUCTS
+-- 4. SEED 10 REAL ARCHIVAL PRODUCTS (BAGS, LUGGAGE & TECHWEAR)
 -- ------------------------------------------------------------------------------
 
 INSERT INTO public.products (
@@ -194,306 +194,26 @@ INSERT INTO public.products (
   size, measurements, description, details, images, in_stock, is_1of1, inventory_type, stock_count,
   store_id, store_name, is_hidden, is_reserved, is_archived, is_hot_deal, is_trending, tags, drop_batch, date_added
 ) VALUES (
-  'jk-archival-001',
-  '1994-carhartt-detroit-canvas-work-jacket',
-  '1994 Carhartt Detroit Canvas Work Jacket',
-  'Apparel',
-  'Workwear & Jackets',
-  '1990s',
-  16500.00,
-  22000.00,
-  'Vintage 9/10 - Natural Faded Patina',
-  'Good',
-  'L',
-  '{"chest": "24.0 in", "length": "27.5 in", "shoulders": "20.5 in", "sleeve": "25.0 in"}'::jsonb,
-  'Original 1994 Carhartt J97 MOS Detroit duck canvas jacket in washed tan with signature contrast corduroy collar and heavy brass zip. Natural honeycombing and authentic workwear patina with zero structural tears.',
-  '["Heavyweight 12oz firm hand cotton duck", "Blanket lined body with quilted nylon sleeve lining", "Corduroy top collar with under-collar snaps", "Zippered left chest pocket with Carhartt patch", "Made in USA"]'::jsonb,
-  '["/images/products/carhartt-detroit-jacket.jpg"]'::jsonb,
-  TRUE, TRUE, 'thrift_1of1', 1,
-  'store-f7-archive', 'F-7 Flagship Archive',
-  FALSE, FALSE, FALSE, TRUE, TRUE,
-  '["Carhartt", "Detroit", "Workwear", "1-of-1", "Vintage", "Duck Canvas"]'::jsonb,
-  'Batch #48: Archival Workwear', NOW()
-) ON CONFLICT (id) DO UPDATE SET
-  title = EXCLUDED.title, price = EXCLUDED.price, images = EXCLUDED.images, details = EXCLUDED.details, measurements = EXCLUDED.measurements, updated_at = NOW();
-
-INSERT INTO public.products (
-  id, slug, title, category, subcategory, era, price, original_price, condition_grade, condition_tier,
-  size, measurements, description, details, images, in_stock, is_1of1, inventory_type, stock_count,
-  store_id, store_name, is_hidden, is_reserved, is_archived, is_hot_deal, is_trending, tags, drop_batch, date_added
-) VALUES (
-  'jk-archival-002',
-  '1993-nirvana-in-utero-official-tour-tee',
-  '1993 Nirvana "In Utero" Official European Tour Tee',
-  'Apparel',
-  'Graphic Tees',
-  '1990s',
-  24000.00,
-  30000.00,
-  'Vintage 9/10 - Single Stitch Archival',
-  'Mint Vintage',
-  'XL',
-  '{"chest": "23.5 in", "length": "29.5 in", "shoulders": "21.0 in", "sleeve": "8.5 in"}'::jsonb,
-  'Ultra-rare authentic 1993 Nirvana In Utero European tour graphic tee printed on authentic Giant by Tee Jays heavyweight blank. Single-stitched sleeves and waist hem with stunning sun-bleached charcoal fade.',
-  '["Original Giant paper tag intact", "Single stitch throughout sleeves and hem", "Sun-faded charcoal wash with vibrant front angel & back tour dates", "Zero dry rot or stitch unraveling"]'::jsonb,
-  '["/images/products/nirvana-in-utero-tee.jpg"]'::jsonb,
-  TRUE, TRUE, 'thrift_1of1', 1,
-  'store-f7-archive', 'F-7 Flagship Archive',
-  FALSE, FALSE, FALSE, TRUE, TRUE,
-  '["Nirvana", "In Utero", "Band Tee", "Single Stitch", "1-of-1", "90s Grunge"]'::jsonb,
-  'Batch #48: Archival Workwear', NOW()
-) ON CONFLICT (id) DO UPDATE SET
-  title = EXCLUDED.title, price = EXCLUDED.price, images = EXCLUDED.images, details = EXCLUDED.details, measurements = EXCLUDED.measurements, updated_at = NOW();
-
-INSERT INTO public.products (
-  id, slug, title, category, subcategory, era, price, original_price, condition_grade, condition_tier,
-  size, measurements, description, details, images, in_stock, is_1of1, inventory_type, stock_count,
-  store_id, store_name, is_hidden, is_reserved, is_archived, is_hot_deal, is_trending, tags, drop_batch, date_added
-) VALUES (
-  'jk-archival-003',
-  '1992-polo-ralph-lauren-stadium-windbreaker',
-  '1992 Polo Ralph Lauren Stadium 1992 Windbreaker',
-  'Apparel',
-  'Outerwear',
-  '1990s',
-  32000.00,
-  45000.00,
-  'Archive 9.5/10 - Collector Grail',
-  'Mint Vintage',
-  'L',
-  '{"chest": "25.0 in", "length": "27.0 in", "shoulders": "22.0 in", "sleeve": "24.5 in"}'::jsonb,
-  'Holy grail of vintage Americana sportswear: the 1992 Polo Ralph Lauren Stadium Olympic collection windbreaker. Featuring iconic navy, red, and white colorblocking with original embroidered Stadium patches.',
-  '["Original 1992 Polo Stadium badge", "Colorblocked nylon shell with breathable mesh lining", "Stowaway hood and drawcord waist", "Collector-grade preservation"]'::jsonb,
-  '["/images/products/ralph-lauren-stadium-1992.jpg"]'::jsonb,
-  TRUE, TRUE, 'thrift_1of1', 1,
-  'store-f7-archive', 'F-7 Flagship Archive',
-  FALSE, FALSE, FALSE, FALSE, TRUE,
-  '["Polo", "Stadium 1992", "Ralph Lauren", "Grail", "Sportswear", "1-of-1"]'::jsonb,
-  'Batch #48: Archival Workwear', NOW()
-) ON CONFLICT (id) DO UPDATE SET
-  title = EXCLUDED.title, price = EXCLUDED.price, images = EXCLUDED.images, details = EXCLUDED.details, measurements = EXCLUDED.measurements, updated_at = NOW();
-
-INSERT INTO public.products (
-  id, slug, title, category, subcategory, era, price, original_price, condition_grade, condition_tier,
-  size, measurements, description, details, images, in_stock, is_1of1, inventory_type, stock_count,
-  store_id, store_name, is_hidden, is_reserved, is_archived, is_hot_deal, is_trending, tags, drop_batch, date_added
-) VALUES (
-  'jk-archival-004',
-  '1988-schott-nyc-type-a2-cowhide-bomber',
-  '1988 Schott NYC Type A-2 Cowhide Flight Bomber',
-  'Apparel',
-  'Leather & Outerwear',
-  '1980s',
-  28500.00,
-  38000.00,
-  'Vintage 8.5/10 - Aged Leather Patina',
-  'Good',
-  '42 (L)',
-  '{"chest": "23.0 in", "length": "26.5 in", "shoulders": "19.5 in", "sleeve": "25.5 in"}'::jsonb,
-  'Vintage 1988 Schott NYC military Type A-2 flight jacket in full-grain naked cowhide. Deep mahogany brown with authentic distressed surface wear, heavy Talon brass zipper, and dual snap-flap pockets.',
-  '["Full-grain American steerhide/cowhide", "Original Talon brass zipper", "Dual-entry front patch pockets", "Knit wool cuffs and waistband intact", "Made in Union, NJ, USA"]'::jsonb,
-  '["/images/products/schott-nyc-type-a2-leather.jpg"]'::jsonb,
-  TRUE, TRUE, 'thrift_1of1', 1,
-  'store-f7-archive', 'F-7 Flagship Archive',
-  FALSE, FALSE, FALSE, TRUE, FALSE,
-  '["Schott NYC", "Leather Bomber", "Type A-2", "Flight Jacket", "1-of-1", "Made in USA"]'::jsonb,
-  'Batch #48: Archival Workwear', NOW()
-) ON CONFLICT (id) DO UPDATE SET
-  title = EXCLUDED.title, price = EXCLUDED.price, images = EXCLUDED.images, details = EXCLUDED.details, measurements = EXCLUDED.measurements, updated_at = NOW();
-
-INSERT INTO public.products (
-  id, slug, title, category, subcategory, era, price, original_price, condition_grade, condition_tier,
-  size, measurements, description, details, images, in_stock, is_1of1, inventory_type, stock_count,
-  store_id, store_name, is_hidden, is_reserved, is_archived, is_hot_deal, is_trending, tags, drop_batch, date_added
-) VALUES (
-  'jk-archival-005',
-  '1996-champion-reverse-weave-heather-grey-hoodie',
-  '1996 Champion Reverse Weave Heavyweight Boxy Hoodie',
-  'Apparel',
-  'Hoodies & Sweats',
-  '1990s',
-  11500.00,
-  15000.00,
-  'Vintage 9/10 - Sun Bleached',
-  'Good',
-  'XL',
-  '{"chest": "25.5 in", "length": "28.0 in", "shoulders": "22.5 in", "sleeve": "24.5 in"}'::jsonb,
-  '90s heavyweight Champion Reverse Weave pullover hoodie in classic silver-heather grey. Side gusset rib panels, embroidered C patch on left wrist, double-ply hood, and signature boxy drape.',
-  '["Original Champion blue-bar embroidered tag", "Signature vertical fleece grain with side rib knit panels", "12oz cross-grain heavyweight fleece", "Made in USA"]'::jsonb,
-  '["/images/products/champion-reverse-weave-hoodie.jpg"]'::jsonb,
-  TRUE, TRUE, 'thrift_1of1', 1,
-  'store-f7-archive', 'F-7 Flagship Archive',
-  FALSE, FALSE, FALSE, FALSE, TRUE,
-  '["Champion", "Reverse Weave", "Heather Grey", "Boxy Cut", "Vintage Hoodie"]'::jsonb,
-  'Batch #48: Archival Workwear', NOW()
-) ON CONFLICT (id) DO UPDATE SET
-  title = EXCLUDED.title, price = EXCLUDED.price, images = EXCLUDED.images, details = EXCLUDED.details, measurements = EXCLUDED.measurements, updated_at = NOW();
-
-INSERT INTO public.products (
-  id, slug, title, category, subcategory, era, price, original_price, condition_grade, condition_tier,
-  size, measurements, description, details, images, in_stock, is_1of1, inventory_type, stock_count,
-  store_id, store_name, is_hidden, is_reserved, is_archived, is_hot_deal, is_trending, tags, drop_batch, date_added
-) VALUES (
-  'jk-archival-006',
-  '1997-stussy-international-tribe-flannel',
-  '1997 Stüssy International Tribe Shadow Plaid Flannel',
-  'Apparel',
-  'Shirts',
-  '1990s',
-  13500.00,
-  17000.00,
-  'Vintage 9/10 - Soft Brushed Cotton',
-  'Good',
-  'L',
-  '{"chest": "24.0 in", "length": "30.0 in", "shoulders": "20.5 in", "sleeve": "24.0 in"}'::jsonb,
-  'Golden era 1997 Stüssy International Tribe oversized flannel overshirt in shadow navy and olive plaid. Features dual chest flap pockets, pearlescent buttons, and embroidered IST tab on side seam.',
-  '["100% heavyweight brushed cotton flannel", "Stüssy IST flag label on side hem", "Boxy 90s streetwear cut with curved hem", "Original Stüssy California label"]'::jsonb,
-  '["/images/products/stussy-flannel-overshirt.jpg"]'::jsonb,
-  TRUE, TRUE, 'thrift_1of1', 1,
-  'store-f7-archive', 'F-7 Flagship Archive',
-  FALSE, FALSE, FALSE, FALSE, FALSE,
-  '["Stüssy", "International Tribe", "Flannel", "Shadow Plaid", "90s Streetwear"]'::jsonb,
-  'Batch #48: Archival Workwear', NOW()
-) ON CONFLICT (id) DO UPDATE SET
-  title = EXCLUDED.title, price = EXCLUDED.price, images = EXCLUDED.images, details = EXCLUDED.details, measurements = EXCLUDED.measurements, updated_at = NOW();
-
-INSERT INTO public.products (
-  id, slug, title, category, subcategory, era, price, original_price, condition_grade, condition_tier,
-  size, measurements, description, details, images, in_stock, is_1of1, inventory_type, stock_count,
-  store_id, store_name, is_hidden, is_reserved, is_archived, is_hot_deal, is_trending, tags, drop_batch, date_added
-) VALUES (
-  'jk-archival-007',
-  '1996-north-face-nuptse-700-down-puffer',
-  '1996 The North Face Nuptse 700-Down Puffer Jacket',
-  'Apparel',
-  'Outerwear',
-  '1990s',
-  21000.00,
-  28000.00,
-  'Vintage 9/10 - Ultra Loft 700 Down',
-  'Good',
-  'M',
-  '{"chest": "23.5 in", "length": "26.5 in", "shoulders": "21.0 in", "sleeve": "25.0 in"}'::jsonb,
-  'Archival 1996 The North Face Nuptse in classic two-tone forest green and black nylon ripstop. High-loft 700 goose down fill, packable hood in collar, and embroidered white TNF chest & back logos.',
-  '["700-fill certified goose down insulation", "Original ripstop nylon with DWR finish", "Stowable hood rolls into collar", "YKK VISLON two-way front zip"]'::jsonb,
-  '["/images/products/north-face-nuptse-puffer.jpg"]'::jsonb,
-  TRUE, TRUE, 'thrift_1of1', 1,
-  'store-f7-archive', 'F-7 Flagship Archive',
-  FALSE, FALSE, FALSE, TRUE, TRUE,
-  '["The North Face", "Nuptse", "700 Down", "Puffer", "Vintage Outerwear"]'::jsonb,
-  'Batch #48: Archival Workwear', NOW()
-) ON CONFLICT (id) DO UPDATE SET
-  title = EXCLUDED.title, price = EXCLUDED.price, images = EXCLUDED.images, details = EXCLUDED.details, measurements = EXCLUDED.measurements, updated_at = NOW();
-
-INSERT INTO public.products (
-  id, slug, title, category, subcategory, era, price, original_price, condition_grade, condition_tier,
-  size, measurements, description, details, images, in_stock, is_1of1, inventory_type, stock_count,
-  store_id, store_name, is_hidden, is_reserved, is_archived, is_hot_deal, is_trending, tags, drop_batch, date_added
-) VALUES (
-  'jk-archival-008',
-  '1991-harley-davidson-3d-emblem-biker-tee',
-  '1991 Harley Davidson 3D Emblem Washed Biker Tee',
-  'Apparel',
-  'Graphic Tees',
-  '1990s',
-  18500.00,
-  24000.00,
-  'Vintage 9/10 - Soft Fade & Single Stitch',
-  'Mint Vintage',
-  'L',
-  '{"chest": "22.5 in", "length": "28.5 in", "shoulders": "20.0 in", "sleeve": "8.0 in"}'::jsonb,
-  'Iconic 1991 Harley-Davidson licensed 3D Emblem Fort Worth graphic tee. Features soaring bald eagle over scenic canyon artwork with vintage cracked ink print and single-stitch construction.',
-  '["Official 3D Emblem Fort Worth, Texas copyright 1991", "Single-stitch sleeves and hem", "Faded charcoal grey washed cotton", "Zero holes, tears, or dry rot"]'::jsonb,
-  '["/images/products/harley-davidson-vintage-tee.jpg"]'::jsonb,
-  TRUE, TRUE, 'thrift_1of1', 1,
-  'store-f7-archive', 'F-7 Flagship Archive',
-  FALSE, FALSE, FALSE, FALSE, TRUE,
-  '["Harley Davidson", "3D Emblem", "Biker Tee", "Single Stitch", "Vintage 1991"]'::jsonb,
-  'Batch #48: Archival Workwear', NOW()
-) ON CONFLICT (id) DO UPDATE SET
-  title = EXCLUDED.title, price = EXCLUDED.price, images = EXCLUDED.images, details = EXCLUDED.details, measurements = EXCLUDED.measurements, updated_at = NOW();
-
-INSERT INTO public.products (
-  id, slug, title, category, subcategory, era, price, original_price, condition_grade, condition_tier,
-  size, measurements, description, details, images, in_stock, is_1of1, inventory_type, stock_count,
-  store_id, store_name, is_hidden, is_reserved, is_archived, is_hot_deal, is_trending, tags, drop_batch, date_added
-) VALUES (
-  'jk-archival-009',
-  '1995-air-jordan-11-retro-concord-og',
-  '1995 Air Jordan 11 Retro Concord OG',
-  'Footwear',
-  'Sneakers',
-  '1990s',
-  34000.00,
-  45000.00,
-  'Vintage 9/10 - Oxidized Cream Ice Soles',
-  'Mint Vintage',
-  'US 10.5 (EU 44.5)',
-  '{"insole": "28.5 cm", "width": "Standard D"}'::jsonb,
-  'Tinker Hatfield signature design: the original 1995 Air Jordan 11 Concord. Features pristine high-cut black patent leather, white ballistic mesh, full-length carbon fiber shank plate, and authentic oxidized cream translucent outsole.',
-  '["Original high-cut patent leather cut", "Real carbon fiber spring plate intact", "Jumpman Jordan center tongue ribbon", "Preserved in temperature-controlled archive"]'::jsonb,
-  '["/images/products/jordan-11-concord-og.jpg"]'::jsonb,
-  TRUE, TRUE, 'thrift_1of1', 1,
-  'store-f7-archive', 'F-7 Flagship Archive',
-  FALSE, FALSE, FALSE, TRUE, TRUE,
-  '["Jordan 11", "Concord", "OG", "Patent Leather", "Sneakerhead Grail"]'::jsonb,
-  'Batch #48: Archival Workwear', NOW()
-) ON CONFLICT (id) DO UPDATE SET
-  title = EXCLUDED.title, price = EXCLUDED.price, images = EXCLUDED.images, details = EXCLUDED.details, measurements = EXCLUDED.measurements, updated_at = NOW();
-
-INSERT INTO public.products (
-  id, slug, title, category, subcategory, era, price, original_price, condition_grade, condition_tier,
-  size, measurements, description, details, images, in_stock, is_1of1, inventory_type, stock_count,
-  store_id, store_name, is_hidden, is_reserved, is_archived, is_hot_deal, is_trending, tags, drop_batch, date_added
-) VALUES (
-  'jk-archival-010',
-  '1990-red-wing-iron-ranger-8111-boots',
-  '1990 Red Wing Heritage Iron Ranger 8111 Boots',
-  'Footwear',
-  'Boots',
-  '1990s',
-  26000.00,
-  35000.00,
-  'Vintage 9/10 - Amber Harness Patina',
-  'Good',
-  'US 9.5 D (EU 42.5)',
-  '{"insole": "27.5 cm", "height": "6.0 in"}'::jsonb,
-  'Vintage 1990s Red Wing 8111 Iron Ranger work boots in Amber Harness oil-tanned leather. Features the classic double-layer cap toe, Goodyear welt construction, patinated brass eyelets, and Nitrile Cork outsole.',
-  '["Oil-tanned full-grain Amber Harness leather", "Goodyear welted resoleable construction", "Iconic double-layer cap toe", "Made in Red Wing, Minnesota, USA"]'::jsonb,
-  '["/images/products/red-wing-iron-ranger.jpg"]'::jsonb,
-  TRUE, TRUE, 'thrift_1of1', 1,
-  'store-f7-archive', 'F-7 Flagship Archive',
-  FALSE, FALSE, FALSE, FALSE, TRUE,
-  '["Red Wing", "Iron Ranger", "8111", "Goodyear Welt", "Made in USA", "Leather Boots"]'::jsonb,
-  'Batch #48: Archival Workwear', NOW()
-) ON CONFLICT (id) DO UPDATE SET
-  title = EXCLUDED.title, price = EXCLUDED.price, images = EXCLUDED.images, details = EXCLUDED.details, measurements = EXCLUDED.measurements, updated_at = NOW();
-
-INSERT INTO public.products (
-  id, slug, title, category, subcategory, era, price, original_price, condition_grade, condition_tier,
-  size, measurements, description, details, images, in_stock, is_1of1, inventory_type, stock_count,
-  store_id, store_name, is_hidden, is_reserved, is_archived, is_hot_deal, is_trending, tags, drop_batch, date_added
-) VALUES (
-  'jk-archival-011',
-  '1998-oakley-minutes-bullet-sunglasses',
-  '1998 Oakley Minutes Bullet Sunglasses',
+  'jk-archive-001',
+  'nike-classic-swoosh-navy-black-canvas-backpack',
+  'Nike Classic Swoosh Navy & Black Canvas Backpack',
   'Accessories',
-  'Eyewear',
-  '1990s',
-  19500.00,
-  26000.00,
-  'Mint 9.5/10 - Flawless Lenses',
-  'Mint Vintage',
-  'One Size',
-  '{"lensWidth": "54mm", "bridge": "18mm", "temple": "135mm"}'::jsonb,
-  'Rare 1998 Y2K era Oakley Minutes with brushed silver X-Metal style sculpted frame and Fire Iridium mirror lenses. Original unobtainium ear socks and nose pads with zero peeling.',
-  '["Sculpted O-Matter lightweight frame", "Plutonite Fire Iridium high-contrast lenses", "Hydrophilic Unobtainium grips", "Collector grade with microfiber vault pouch"]'::jsonb,
-  '["/images/products/oakley-minutes-sunglasses.jpg"]'::jsonb,
+  'Backpacks & Bags',
+  '2000s Vintage',
+  6500.00,
+  8500.00,
+  'Vintage 9/10 - Excellent Condition',
+  'Mint',
+  'One Size (24L)',
+  '{"height":"18.5 in","width":"13.0 in","depth":"6.0 in","volume":"24 Liters"}'::jsonb,
+  'Authentic archival Nike sports backpack featuring high-density navy blue woven canvas with a black coated weather-resistant top panel. Bold white oversized Nike Swoosh graphic, dual two-way heavy zipper pulls, padded ergonomic shoulder straps, and spacious main vault compartment.',
+  '["High-density 600D woven canvas with water-resistant coated top","Screen-printed archival oversized Nike Swoosh","Adjustable padded air-mesh shoulder harness","Dual zipper pulls with reinforced storm guard","Spacious 24L volume fitting 15-inch laptops"]'::jsonb,
+  '["/images/products/nike-swoosh-navy-backpack.jpg"]'::jsonb,
   TRUE, TRUE, 'thrift_1of1', 1,
   'store-f7-archive', 'F-7 Flagship Archive',
-  FALSE, FALSE, FALSE, TRUE, FALSE,
-  '["Oakley", "Minutes", "Fire Iridium", "Y2K", "Vintage Eyewear", "Grail"]'::jsonb,
-  'Batch #48: Archival Workwear', NOW()
+  FALSE, FALSE, FALSE, TRUE, TRUE,
+  '["Nike","Backpack","Swoosh","Streetwear","Vintage Nike","1-of-1","Archive Bag"]'::jsonb,
+  'Batch #49: Archival Luggage & Bags', NOW()
 ) ON CONFLICT (id) DO UPDATE SET
   title = EXCLUDED.title, price = EXCLUDED.price, images = EXCLUDED.images, details = EXCLUDED.details, measurements = EXCLUDED.measurements, updated_at = NOW();
 
@@ -502,26 +222,26 @@ INSERT INTO public.products (
   size, measurements, description, details, images, in_stock, is_1of1, inventory_type, stock_count,
   store_id, store_name, is_hidden, is_reserved, is_archived, is_hot_deal, is_trending, tags, drop_batch, date_added
 ) VALUES (
-  'jk-archival-012',
-  '1992-carhartt-heavy-duck-canvas-tool-tote',
-  '1992 Carhartt Heavy Duck Canvas Tool Tote',
+  'jk-archive-002',
+  'aibag-tactical-techwear-all-black-waterproof-backpack',
+  'AIBAG Tactical Techwear All-Black Waterproof Backpack',
   'Accessories',
-  'Bags',
-  '1990s',
+  'Tactical & Techwear',
+  'Archival Techwear',
   9500.00,
-  13000.00,
-  'Vintage 8.5/10 - Heavyweight Canvas',
-  'Good',
-  'One Size (Large)',
-  '{"width": "18.0 in", "height": "14.0 in", "depth": "7.0 in"}'::jsonb,
-  'Ultra-durable vintage 1992 Carhartt workwear utility tool tote crafted from 100% 12-ounce cotton duck canvas with reinforced webbed shoulder straps and brass rivet reinforcements.',
-  '["12oz firm-hand Carhartt brown duck canvas", "Dual exterior slide pockets and reinforced base", "Antiqued brass rivets at stress points", "Original woven Carhartt C logo patch"]'::jsonb,
-  '["/images/products/carhartt-duck-tool-tote.jpg"]'::jsonb,
+  12500.00,
+  'Deadstock 10/10 - Brand New with Tags',
+  'Deadstock',
+  'One Size (30L)',
+  '{"height":"19.5 in","width":"13.5 in","depth":"7.0 in","volume":"30 Liters"}'::jsonb,
+  'Futuristic techwear tactical backpack by AIBAG in matte black coated water-repellent shell. Features top flap closure with dual quick-release ABS buckles, subtle iridescent holographic accent tab, 3D chevron logo, padded breathable air-mesh back panel, and chest stabilizer buckle. Includes original factory hangtags.',
+  '["Waterproof polyurethane-coated high-density textile","Dual front quick-release heavy duty compression buckles","Ergonomic 3D mesh breathable spine padding with sternum strap","Original AIBAG brand hangtags attached","Internal padded shockproof laptop sleeve up to 16 inches"]'::jsonb,
+  '["/images/products/aibag-tactical-techwear-backpack-front.jpg","/images/products/aibag-tactical-techwear-backpack-back.jpg"]'::jsonb,
   TRUE, TRUE, 'thrift_1of1', 1,
   'store-f7-archive', 'F-7 Flagship Archive',
-  FALSE, FALSE, FALSE, FALSE, FALSE,
-  '["Carhartt", "Tool Tote", "Duck Canvas", "Vintage Bag", "Workwear"]'::jsonb,
-  'Batch #48: Archival Workwear', NOW()
+  FALSE, FALSE, FALSE, FALSE, TRUE,
+  '["AIBAG","Techwear","Tactical","Waterproof","Matte Black","1-of-1","Laptop Backpack"]'::jsonb,
+  'Batch #49: Archival Luggage & Bags', NOW()
 ) ON CONFLICT (id) DO UPDATE SET
   title = EXCLUDED.title, price = EXCLUDED.price, images = EXCLUDED.images, details = EXCLUDED.details, measurements = EXCLUDED.measurements, updated_at = NOW();
 
@@ -530,25 +250,222 @@ INSERT INTO public.products (
   size, measurements, description, details, images, in_stock, is_1of1, inventory_type, stock_count,
   store_id, store_name, is_hidden, is_reserved, is_archived, is_hot_deal, is_trending, tags, drop_batch, date_added
 ) VALUES (
-  'jk-archival-013',
-  '1990-hermes-paris-silk-equestrian-scarf',
-  '1990 Hermès Paris Silk Equestrian Scarf (90cm)',
+  'jk-archive-003',
+  'kemitu-harajuku-pastel-bunny-ears-canvas-tote-backpack',
+  'KeMiTu Harajuku Pastel Bunny Ears Canvas Tote Backpack',
   'Accessories',
-  'Scarves & Silks',
-  '1990s',
-  29000.00,
-  42000.00,
-  'Mint 9.5/10 - Plump Hand-Rolled Edges',
-  'Mint Vintage',
-  '90cm x 90cm',
-  '{"dimensions": "35.5 in x 35.5 in"}'::jsonb,
-  'Authentic 1990 Hermès Paris vintage 90cm carré scarf in 100% silk twill. Classic equestrian stirrup and harness motif in imperial navy, rich archive gold, and ivory. Features plump, hand-rolled edges.',
-  '["100% heavyweight mulberry silk twill", "Hand-rolled and hand-stitched hem edges", "Hermès Paris copyright stamped in print", "Flawless silk sheen with zero pulls or stains"]'::jsonb,
-  '["/images/products/hermes-silk-scarf.jpg"]'::jsonb,
+  'Totes & Harajuku',
+  'Japanese Kawaii Y2K',
+  5800.00,
+  7500.00,
+  'Mint 9.5/10 - Like New Condition',
+  'Mint',
+  'One Size (Convertible)',
+  '{"height":"15.0 in","width":"13.0 in","depth":"4.5 in"}'::jsonb,
+  'Japanese aesthetic pastel Harajuku canvas convertible bag featuring soft lilac purple and ivory cream color-blocking with stitched plush bunny ears. Includes detachable round zip coin purse featuring "Happy Time" wizard puppy character, reinforced webbing tote handles, and convertible shoulder backpack straps.',
+  '["Heavyweight pastel canvas with durable nylon webbing","Embroidered plush bunny ear front flap detail","Detachable clip-on \"Happy Time\" circular coin pouch","Dual side elastic bottle pockets & smooth nylon top zip","Convertible 2-way carry: hand tote or shoulder backpack"]'::jsonb,
+  '["/images/products/kemitu-pastel-bunny-tote-backpack.jpg"]'::jsonb,
+  TRUE, TRUE, 'thrift_1of1', 1,
+  'store-f7-archive', 'F-7 Flagship Archive',
+  FALSE, FALSE, FALSE, TRUE, TRUE,
+  '["KeMiTu","Harajuku","Pastel","Kawaii","Bunny Ears","Canvas Tote","1-of-1"]'::jsonb,
+  'Batch #49: Archival Luggage & Bags', NOW()
+) ON CONFLICT (id) DO UPDATE SET
+  title = EXCLUDED.title, price = EXCLUDED.price, images = EXCLUDED.images, details = EXCLUDED.details, measurements = EXCLUDED.measurements, updated_at = NOW();
+
+INSERT INTO public.products (
+  id, slug, title, category, subcategory, era, price, original_price, condition_grade, condition_tier,
+  size, measurements, description, details, images, in_stock, is_1of1, inventory_type, stock_count,
+  store_id, store_name, is_hidden, is_reserved, is_archived, is_hot_deal, is_trending, tags, drop_batch, date_added
+) VALUES (
+  'jk-archive-004',
+  'capybara-harajuku-aesthetic-multi-pocket-cream-canvas-tote',
+  'Capybara Harajuku Aesthetic Multi-Pocket Cream Canvas Tote',
+  'Accessories',
+  'Totes & Harajuku',
+  'Harajuku Streetwear',
+  5500.00,
+  7000.00,
+  'Mint 9.5/10 - Pristine Condition',
+  'Mint',
+  'One Size (Large Tote)',
+  '{"height":"15.5 in","width":"14.0 in","depth":"4.5 in"}'::jsonb,
+  'Aesthetic Japanese college streetwear cream canvas tote bag with embroidered Capybara logo motif. Front features a spacious transparent mesh utility pocket displaying collectible anime art cards, top zip compartment with pull tabs, and circular enamel character pin badge on upper collar.',
+  '["Natural ecru cream heavyweight washed cotton canvas","Front breathable mesh pocket with anime collectible cards","Embroidered Capybara Japanese typography graphic","Includes collectible round capybara badge pin","Reinforced shoulder webbing straps with box-stitching"]'::jsonb,
+  '["/images/products/capybara-harajuku-cream-canvas-tote.jpg"]'::jsonb,
+  TRUE, TRUE, 'thrift_1of1', 1,
+  'store-f7-archive', 'F-7 Flagship Archive',
+  FALSE, FALSE, FALSE, FALSE, TRUE,
+  '["Capybara","Harajuku","Aesthetic","Cream Tote","Mesh Pocket","Streetwear","1-of-1"]'::jsonb,
+  'Batch #49: Archival Luggage & Bags', NOW()
+) ON CONFLICT (id) DO UPDATE SET
+  title = EXCLUDED.title, price = EXCLUDED.price, images = EXCLUDED.images, details = EXCLUDED.details, measurements = EXCLUDED.measurements, updated_at = NOW();
+
+INSERT INTO public.products (
+  id, slug, title, category, subcategory, era, price, original_price, condition_grade, condition_tier,
+  size, measurements, description, details, images, in_stock, is_1of1, inventory_type, stock_count,
+  store_id, store_name, is_hidden, is_reserved, is_archived, is_hot_deal, is_trending, tags, drop_batch, date_added
+) VALUES (
+  'jk-archive-005',
+  'tbj-kids-urban-utility-multi-pocket-ok-canvas-tote',
+  'TBJ-KIDS Urban Utility Multi-Pocket "OK!" Canvas Tote',
+  'Accessories',
+  'Totes & Harajuku',
+  'Y2K Utility Streetwear',
+  5200.00,
+  6800.00,
+  'Mint 9.5/10 - Flawless Condition',
+  'Mint',
+  'One Size (Multi-Pocket)',
+  '{"height":"14.5 in","width":"13.5 in","depth":"5.0 in"}'::jsonb,
+  'Tactical urban utility canvas shoulder bag in crisp off-white with contrast black cross-webbing and D-rings. Equipped with an exterior flap cargo pouch with rubberized TBJ-KIDS badge, detachable circular "OK!" zip pouch, upper zip organizer pocket, and dual side hydration sleeves.',
+  '["Durable water-resistant woven cream canvas shell","Contrast black tactical daisy-chain webbing with matte black D-rings","Detachable clip-on \"OK!\" circular coin/airpods purse","Front cargo flap pocket with rubber TBJ-KIDS emblem","Dual side cinch pockets for bottles or umbrella"]'::jsonb,
+  '["/images/products/tbj-kids-urban-utility-ok-tote.jpg"]'::jsonb,
   TRUE, TRUE, 'thrift_1of1', 1,
   'store-f7-archive', 'F-7 Flagship Archive',
   FALSE, FALSE, FALSE, TRUE, FALSE,
-  '["Hermès", "Silk Scarf", "Carré 90", "Vintage Luxury", "Equestrian", "Grail"]'::jsonb,
-  'Batch #48: Archival Workwear', NOW()
+  '["TBJ-KIDS","Utility Tote","Tactical Canvas","Urban Streetwear","OK Pouch","1-of-1"]'::jsonb,
+  'Batch #49: Archival Luggage & Bags', NOW()
 ) ON CONFLICT (id) DO UPDATE SET
   title = EXCLUDED.title, price = EXCLUDED.price, images = EXCLUDED.images, details = EXCLUDED.details, measurements = EXCLUDED.measurements, updated_at = NOW();
+
+INSERT INTO public.products (
+  id, slug, title, category, subcategory, era, price, original_price, condition_grade, condition_tier,
+  size, measurements, description, details, images, in_stock, is_1of1, inventory_type, stock_count,
+  store_id, store_name, is_hidden, is_reserved, is_archived, is_hot_deal, is_trending, tags, drop_batch, date_added
+) VALUES (
+  'jk-archive-006',
+  'harajuku-streetwear-canvas-trio-archival-collector-set',
+  'Harajuku Streetwear Canvas Trio Archival Collector Set',
+  'Accessories',
+  'Curated Bundles',
+  'Japanese Harajuku Archive',
+  14500.00,
+  19000.00,
+  'Collector Vault 9.5/10 - Three Piece Set',
+  'Mint',
+  'Set of 3 Matching Bags',
+  '{"setIncludes":"3 Complete Archival Canvas Totes with all pouches & pins"}'::jsonb,
+  'Rare opportunity to acquire the complete three-piece archival Harajuku canvas bag collector set: 1) The KeMiTu Pastel Lilac Bunny Ears Convertible Backpack, 2) The Capybara Mesh Utility Tote with Collector Art, and 3) The TBJ-KIDS Urban Utility OK! Cargo Tote. Complete with all detachable coin purses, pins, and accessories.',
+  '["Curated full 3-piece Harajuku aesthetic canvas vault bundle","All original detachable coin purses and character pins included","Premium durable washed cotton canvas and heavy webbing straps","Verified authentic 1-of-1 Japanese thrift vault selection","Special bundled archive collector pricing"]'::jsonb,
+  '["/images/products/harajuku-canvas-tote-trio-collection.jpg"]'::jsonb,
+  TRUE, TRUE, 'thrift_1of1', 1,
+  'store-f7-archive', 'F-7 Flagship Archive',
+  FALSE, FALSE, FALSE, TRUE, TRUE,
+  '["Harajuku Trio","Collector Set","Canvas Bags","Kawaii","Bundle Deal","1-of-1 Grail"]'::jsonb,
+  'Batch #49: Archival Luggage & Bags', NOW()
+) ON CONFLICT (id) DO UPDATE SET
+  title = EXCLUDED.title, price = EXCLUDED.price, images = EXCLUDED.images, details = EXCLUDED.details, measurements = EXCLUDED.measurements, updated_at = NOW();
+
+INSERT INTO public.products (
+  id, slug, title, category, subcategory, era, price, original_price, condition_grade, condition_tier,
+  size, measurements, description, details, images, in_stock, is_1of1, inventory_type, stock_count,
+  store_id, store_name, is_hidden, is_reserved, is_archived, is_hot_deal, is_trending, tags, drop_batch, date_added
+) VALUES (
+  'jk-archive-007',
+  'tbjinag-im-ok-warm-caramel-bear-utility-canvas-tote',
+  'TBJINAG "I''m OK!" Warm Caramel Bear Utility Canvas Tote',
+  'Accessories',
+  'Totes & Harajuku',
+  'Vintage Retro Streetwear',
+  5400.00,
+  7000.00,
+  'Vintage 9/10 - Great Condition',
+  'Good',
+  'One Size (Carryall Tote)',
+  '{"height":"15.0 in","width":"13.5 in","depth":"5.0 in"}'::jsonb,
+  'Warm caramel-brown and cream multi-tone utility tote bag featuring stitched character ears and front clear window pouch with cartoon bear comic prints. Golden "I''m OK! TBJINAG" embroidered branding, copper-toned heavy woven webbing handles, side bottle compartments, and deep zippered interior.',
+  '["Rich caramel brown & warm ivory high-density canvas","Embroidered \"I''m OK! TBJINAG\" signature graphic","Front window pocket with pop-art character art cards","Contrast copper-tan webbing straps with boxed stress reinforcement","Generous carryall capacity for books, tablets, and daily essentials"]'::jsonb,
+  '["/images/products/tbjinag-im-ok-caramel-bear-tote.jpg"]'::jsonb,
+  TRUE, TRUE, 'thrift_1of1', 1,
+  'store-f7-archive', 'F-7 Flagship Archive',
+  FALSE, FALSE, FALSE, FALSE, FALSE,
+  '["TBJINAG","Caramel Tote","Bear Graphic","Retro Canvas","Harajuku","1-of-1"]'::jsonb,
+  'Batch #49: Archival Luggage & Bags', NOW()
+) ON CONFLICT (id) DO UPDATE SET
+  title = EXCLUDED.title, price = EXCLUDED.price, images = EXCLUDED.images, details = EXCLUDED.details, measurements = EXCLUDED.measurements, updated_at = NOW();
+
+INSERT INTO public.products (
+  id, slug, title, category, subcategory, era, price, original_price, condition_grade, condition_tier,
+  size, measurements, description, details, images, in_stock, is_1of1, inventory_type, stock_count,
+  store_id, store_name, is_hidden, is_reserved, is_archived, is_hot_deal, is_trending, tags, drop_batch, date_added
+) VALUES (
+  'jk-archive-008',
+  'cambridge-by-travelway-archival-crimson-luggage-duffel',
+  'Cambridge by Travelway Archival Crimson Luggage Duffel',
+  'Accessories',
+  'Travel & Luggage',
+  '1990s Vintage Luggage',
+  11500.00,
+  15500.00,
+  'Vintage 9/10 - Original Thrift Tag Preserved',
+  'Good',
+  'Medium Carry-On (25L)',
+  '{"height":"17.0 in","width":"12.5 in","depth":"6.5 in","capacity":"25 Liters"}'::jsonb,
+  'Rare 90s archival Cambridge by Travelway structured travel carry-on suitcase duffel in deep crimson woven ballistic nylon. Features signature die-cast Cambridge metal badge, reinforced black piping, double heavy-gauge top zippers, front zip boarding document pouch, and rear luggage trolley pass-through strap. Preserves authentic Value Village thrift provenance tag.',
+  '["Heavyweight textured ballistic nylon in deep crimson red","Die-cast metal \"Cambridge by Travelway\" heritage emblem","Heavy-gauge dual metal zippers with reinforced piping","Rear trolley pass-through strap for rolling luggage attachment","Original Value Village archival thrift tag intact"]'::jsonb,
+  '["/images/products/cambridge-travelway-crimson-duffel-front.jpg","/images/products/cambridge-travelway-crimson-duffel-badge.jpg","/images/products/cambridge-travelway-crimson-duffel-back.jpg","/images/products/cambridge-travelway-crimson-duffel-side.jpg"]'::jsonb,
+  TRUE, TRUE, 'thrift_1of1', 1,
+  'store-f7-archive', 'F-7 Flagship Archive',
+  FALSE, FALSE, FALSE, TRUE, TRUE,
+  '["Cambridge","Travelway","Crimson Duffel","Vintage Luggage","Ballistic Nylon","1-of-1","Value Village Tag"]'::jsonb,
+  'Batch #49: Archival Luggage & Bags', NOW()
+) ON CONFLICT (id) DO UPDATE SET
+  title = EXCLUDED.title, price = EXCLUDED.price, images = EXCLUDED.images, details = EXCLUDED.details, measurements = EXCLUDED.measurements, updated_at = NOW();
+
+INSERT INTO public.products (
+  id, slug, title, category, subcategory, era, price, original_price, condition_grade, condition_tier,
+  size, measurements, description, details, images, in_stock, is_1of1, inventory_type, stock_count,
+  store_id, store_name, is_hidden, is_reserved, is_archived, is_hot_deal, is_trending, tags, drop_batch, date_added
+) VALUES (
+  'jk-archive-009',
+  'travel-select-vintage-burgundy-two-tone-travel-carryall',
+  'Travel Select Vintage Burgundy Two-Tone Travel Carryall',
+  'Accessories',
+  'Travel & Luggage',
+  '1990s Archival Travelwear',
+  10500.00,
+  14000.00,
+  'Vintage 9/10 - Original $15.99 Thrift Tag',
+  'Good',
+  'Medium Carryall (22L)',
+  '{"height":"16.0 in","width":"12.0 in","depth":"6.0 in","capacity":"22 Liters"}'::jsonb,
+  'Archival 90s Travel Select structured travel shoulder duffel in two-tone burgundy twill and matte black ballistic canvas. Features molded oval Travel Select logo patch, dual-pull zip main cavity, front zippered quick-access slip pocket, and rear trolley sleeve. Includes preserved $15.99 Value Village collector thrift tag.',
+  '["Rugged two-tone burgundy and black woven nylon canvas","Signature oval Travel Select brand badge on front panel","Dual oversized metal zipper sliders with luggage lock loops","Rear strap allows secure mounting atop rolling suitcases","Original Value Village $15.99 thrift provenance tag attached"]'::jsonb,
+  '["/images/products/travel-select-burgundy-luggage-front.jpg","/images/products/travel-select-burgundy-luggage-side.jpg","/images/products/travel-select-burgundy-luggage-tag.jpg","/images/products/travel-select-burgundy-luggage-back.jpg"]'::jsonb,
+  TRUE, TRUE, 'thrift_1of1', 1,
+  'store-f7-archive', 'F-7 Flagship Archive',
+  FALSE, FALSE, FALSE, FALSE, TRUE,
+  '["Travel Select","Burgundy Duffel","Vintage Travel","Thrift Tag","1-of-1","Carryall"]'::jsonb,
+  'Batch #49: Archival Luggage & Bags', NOW()
+) ON CONFLICT (id) DO UPDATE SET
+  title = EXCLUDED.title, price = EXCLUDED.price, images = EXCLUDED.images, details = EXCLUDED.details, measurements = EXCLUDED.measurements, updated_at = NOW();
+
+INSERT INTO public.products (
+  id, slug, title, category, subcategory, era, price, original_price, condition_grade, condition_tier,
+  size, measurements, description, details, images, in_stock, is_1of1, inventory_type, stock_count,
+  store_id, store_name, is_hidden, is_reserved, is_archived, is_hot_deal, is_trending, tags, drop_batch, date_added
+) VALUES (
+  'jk-archive-010',
+  'lucas-gear-90s-canary-yellow-high-visibility-travel-duffel',
+  'Lucas Gear 90s Canary Yellow High-Visibility Travel Duffel',
+  'Accessories',
+  'Travel & Luggage',
+  '1990s Y2K Vintage',
+  12000.00,
+  16000.00,
+  'Vintage 9.5/10 - Rare Colorway with $13.99 Thrift Tag',
+  'Mint',
+  'Compact Travel Duffel (20L)',
+  '{"height":"16.0 in","width":"12.0 in","depth":"6.0 in","capacity":"20 Liters"}'::jsonb,
+  'Showstopper 90s vintage travel bag by Lucas Gear in electrifying canary yellow with black piping and heavy webbed shoulder strap. Features 3D rubberized "Lucas Gear" badge on front waffle-mesh pocket, heavy-duty wraparound zippers, and padded top grip handle bearing the original $13.99 Value Village thrift tag.',
+  '["High-visibility canary yellow heavy-duty nylon canvas","Molded 3D rubber Lucas Gear heritage logo","Front breathable rubberized waffle-mesh zipper pocket","Padded handle grip with original Value Village $13.99 price tag","Removable adjustable cross-body shoulder strap with swivel clips"]'::jsonb,
+  '["/images/products/lucas-gear-canary-yellow-duffel-front.jpg","/images/products/lucas-gear-canary-yellow-duffel-handle.jpg"]'::jsonb,
+  TRUE, TRUE, 'thrift_1of1', 1,
+  'store-f7-archive', 'F-7 Flagship Archive',
+  FALSE, FALSE, FALSE, TRUE, TRUE,
+  '["Lucas Gear","Canary Yellow","High-Vis","Vintage Duffel","90s Travel","Value Village Tag","1-of-1 Grail"]'::jsonb,
+  'Batch #49: Archival Luggage & Bags', NOW()
+) ON CONFLICT (id) DO UPDATE SET
+  title = EXCLUDED.title, price = EXCLUDED.price, images = EXCLUDED.images, details = EXCLUDED.details, measurements = EXCLUDED.measurements, updated_at = NOW();
+
